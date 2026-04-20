@@ -1,0 +1,456 @@
+player_id,name,team,games,total_tries,last5_tries,tries_per_game
+a7957678,Dave Horton,Western Force,1,2,2,2.0
+cc193539,Clem Halaholo,Waratahs,1,1,1,1.0
+96633f9e,Temo Mayanavanua,Fijian Drua,1,1,1,1.0
+6ddf999a,Quentin MacDonald,Crusaders,4,4,4,1.0
+09b4ecb6,Tevita Ofa,Moana Pasifika,1,1,1,1.0
+08e4af49,Franco Molina,Force,1,1,1,1.0
+5e7b0c96,Kade Banks,Blues,1,1,1,1.0
+1b12a647,Semisi Tupou,Moana Pasifika,1,1,1,1.0
+dbf9f553,Ofa Tauatevalu,Moana Pasifika,1,1,1,1.0
+7e93e195,Tim Ryan,Reds,11,10,4,0.91
+5364ab74,Zach Kibirige,Western Force,15,12,0,0.8
+5181c94c,Sevu Reece,Crusaders,35,26,4,0.74
+4bb2a971,Leicester Fainga'anuku,Crusaders,32,23,3,0.72
+ec6266d7,Cam Clark,Brumbies,3,2,2,0.67
+ecf5b1ce,Alex Fidow,Hurricanes,3,2,2,0.67
+c45fb01e,Emoni Narawa,Chiefs,41,27,2,0.66
+369b6d45,Corey Toole,Brumbies,32,21,2,0.66
+3f1466db,Iosefo Masi,Fijian Drua,44,28,2,0.64
+8cf8cdd3,Will Jordan,Crusaders,22,14,3,0.64
+e7a7d9bd,Caleb Clarke,Blues,44,28,6,0.64
+a0a316de,Wes Goosen,Hurricanes,13,8,4,0.62
+012b0dd1,Mark Tele'a,Blues,50,29,1,0.58
+95bfb363,Joshua Moorby,Hurricanes,42,24,2,0.57
+b72e9e7c,Salesi Rayasi,Hurricanes,40,23,3,0.57
+722b1819,Codie Taylor,Crusaders,32,18,2,0.56
+be38fbd8,Kini Naholo,Hurricanes,25,14,1,0.56
+0eafd66f,Evan O'Connell,Brumbies,9,5,4,0.56
+257b3e51,Charlie Cale,Brumbies,16,8,3,0.5
+2fe86fec,Vuate Karawalevu,New South Wales Waratahs,2,1,1,0.5
+b9242c5b,Waqa Nalaga,Fijian Drua,8,4,4,0.5
+857cce42,Lachlan Lonergan,Brumbies,36,18,3,0.5
+7cec07ed,Taniela Rakuro,Fijian Drua,24,12,0,0.5
+99ce25ec,Siua Maile,Hurricanes,2,1,1,0.5
+091b11b8,Hame Faiva,Hurricanes,6,3,2,0.5
+eca086da,Logan Henry,Hurricanes,2,1,1,0.5
+ea48b123,Young Tonumaipea,Melbourne Rebels,6,3,3,0.5
+bd146523,Floyd Aubrey,Reds,4,2,2,0.5
+8831a08a,Tom Wright,Brumbies,52,25,5,0.48
+e44732cf,Miracle Faiilagi,Moana Pasifika,19,9,4,0.47
+8031dfca,Onisi Ratave,Fijian Drua,15,7,2,0.47
+f382396a,Daniel Brennan,Chiefs,26,12,1,0.46
+1441813a,Shaun Stevenson,Chiefs,42,19,0,0.45
+956b803a,Cam Roigard,Hurricanes,29,13,3,0.45
+67661a18,Ardie Savea,Hurricanes,27,12,4,0.44
+47bc6611,Hoskins Sotutu,Blues,50,22,3,0.44
+f6aa1d89,Johnny McNicholl,Crusaders,9,4,1,0.44
+d47d5d16,Cortez Ratima,Chiefs,49,21,2,0.43
+843673f2,Folau Fainga'a,Waratahs,23,10,2,0.43
+ca3d8ac3,Jacob Ratumaitavuki-Kneepkens,Highlanders,35,15,2,0.43
+7a64da48,Josh Flook,Reds,41,17,1,0.41
+a2de2470,George Blake,Reds,10,4,2,0.4
+942f6ce8,Vinaya Habosi,Fijian Drua,15,6,2,0.4
+55bd884d,Mark Nawaqanitawase,New South Wales Waratahs,42,17,1,0.4
+22ca90cf,Tom Banks,Brumbies,15,6,1,0.4
+cf099097,Fraser McReight,Reds,44,17,2,0.39
+1d77d514,Lachie Anderson,Reds,31,12,4,0.39
+662cb4d7,Jonah Lowe,Highlanders,31,12,1,0.39
+11cd33dc,Ioane Moananu,Crusaders,8,3,0,0.38
+48072317,TJ Perenara,Hurricanes,26,10,2,0.38
+6719d187,Jeremy Thrush,Western Force,16,6,1,0.38
+c9b57aa3,Billy Proctor,Hurricanes,39,14,1,0.36
+8cb8a9fe,Darby Lancaster,Melbourne Rebels,11,4,0,0.36
+b28fb1c7,Abraham Pole,Moana Pasifika,44,16,1,0.36
+2c5a0566,Jona Nareki,Highlanders,20,7,5,0.35
+6146f9bc,Richard Hardwick,Melbourne Rebels,20,7,2,0.35
+73612d7f,Ricky Riccitelli,Blues,46,16,2,0.35
+ebe2fb3f,Macca Springer,Crusaders,20,7,2,0.35
+11d008f6,Jordan Puletua,Queensland Reds,29,10,1,0.34
+db2d3d9b,Etene Nanai-Seturo,Chiefs,50,17,1,0.34
+77561a88,Andrew Kellaway,Melbourne Rebels,35,12,2,0.34
+9ce05860,Dylan Pietsch,New South Wales Waratahs,41,14,1,0.34
+7f8ac61f,Bryce Hegarty,Western Force,9,3,2,0.33
+7b4f45e7,Taine Plumtree,Blues,6,2,0,0.33
+5afb33a5,James Hanson,Melbourne Rebels,12,4,2,0.33
+6cce8506,Matt Faessler,Reds,43,14,2,0.33
+c26a82ac,Timoci Tavatavanawai,Highlanders,42,14,2,0.33
+7e469103,Siate Taupaki,Hurricanes,3,1,1,0.33
+722c7974,Rory van Vugt,Highlanders,3,1,1,0.33
+7281b14c,Eroni Sau,Fijian Drua,15,5,3,0.33
+9a63863c,Matthew Philip,Rebels,3,1,1,0.33
+0336593b,Brad Weber,Chiefs,30,10,0,0.33
+e9368f38,Suliasi Vunivalu,Reds,33,11,1,0.33
+400e96b1,Kyle Godwin,Western Force,15,5,1,0.33
+311a6a39,Jesse Mogg,Brumbies,12,4,0,0.33
+7dfb0c31,Frank Lomani,Fijian Drua,43,14,3,0.33
+9c7356f9,Tomasi Alosio,Moana Pasifika,6,2,1,0.33
+2d19a78c,Hamilton Burr,Chiefs,3,1,1,0.33
+b2bde3f9,Max Jorgensen,Waratahs,22,7,2,0.32
+b47b3d5d,Beauden Barrett,Blues,29,9,2,0.31
+c78a1f60,Zarn Sullivan,Blues,37,11,2,0.3
+8a38eea1,Jock Campbell,Reds,44,13,1,0.3
+f10c29f7,Carter Gordon,Melbourne Rebels,43,13,0,0.3
+da812de6,Tate McDermott,Queensland Reds,40,12,3,0.3
+ee60a346,Brayden Iose,Hurricanes,37,11,2,0.3
+5d8b5e23,Michael Hooper,New South Wales Waratahs,21,6,1,0.29
+0076afce,Jay Fonokalafi,New South Wales Waratahs,7,2,1,0.29
+709314f0,AJ Lam,Blues,42,12,2,0.29
+0efcdf22,Ethan Blackadder,Crusaders,24,7,2,0.29
+884ad30f,Rob Valetini,Brumbies,49,14,1,0.29
+a4e5c400,Tevita Ikanivere,Fijian Drua,55,16,0,0.29
+e30595f1,Martin Bogado,Highlanders,14,4,0,0.29
+02abb609,Rhys Patchell,Highlanders,7,2,1,0.29
+90f0405c,Irae Simone,Brumbies,18,5,4,0.28
+7adfd128,Ilaisa Droasese,Fijian Drua,43,12,3,0.28
+e3cfdc94,Carlo Tizzano,Force,29,8,3,0.28
+f305fb16,Jake Gordon,Waratahs,43,12,1,0.28
+50706571,Kurt Eklund,Blues,46,13,1,0.28
+82694e7e,Sam Gilbert,Highlanders,47,13,0,0.28
+51f8828b,Byron Ralston,Western Force,11,3,2,0.27
+19c12182,Mosese Dawai,Highlanders,15,4,2,0.27
+d437eb24,Kyren Taumoefolau,Chiefs,11,3,1,0.27
+381c6052,Nikora Broughton,Highlanders,22,6,2,0.27
+4d82d1ee,Pita Gus Sowakula,Chiefs,30,8,2,0.27
+9353b62c,Selestino Ravutaumada,Fijian Drua,55,15,3,0.27
+293ce10b,Blake Gibson,Hurricanes,11,3,1,0.27
+bd52f0ce,Toni Pulu,Western Force,22,6,1,0.27
+4c4eafb3,Levi Aumua,Crusaders,37,10,1,0.27
+8fa36f3d,Pita-Gus Sowakula,Chiefs,30,8,2,0.27
+9261e352,Tima Fainga'anuku,Moana Pasifika,15,4,1,0.27
+275e39aa,Fine Inisi,Moana Pasifika,37,10,4,0.27
+1ce1489b,Manasa Mataele,Fijian Drua,33,9,0,0.27
+0c02ce6e,Dave Porecki,New South Wales Waratahs,27,7,1,0.26
+96358756,Mahe Vailanu,New South Wales Waratahs,27,7,4,0.26
+45c36d77,Sam Parry,Blues,35,9,1,0.26
+a45cb79d,Andy Muirhead,Brumbies,50,13,2,0.26
+d110c304,Len Ikitau,Brumbies,46,12,0,0.26
+50415839,Liam Coombes-Fabling,Chiefs,19,5,1,0.26
+7a252c2f,Solomone Funaki,Moana Pasifika,27,7,0,0.26
+15f3b1d0,Josh Nasser,Queensland Reds,23,6,1,0.26
+b6e95bc8,Sione Ahio,Chiefs,4,1,1,0.25
+f881a0a6,Harry Wilson,New South Wales Waratahs,55,14,1,0.25
+db2a5a12,Siosifa Amone,Western Force,16,4,0,0.25
+ffd881ad,Lachlan Swinton,New South Wales Waratahs,20,5,1,0.25
+00865d56,Andrew Ready,Western Force,16,4,3,0.25
+d7f6b3ff,Glen Vaihu,Moana Pasifika,24,6,3,0.25
+507d08dc,Nemani Nadolo,New South Wales Waratahs,4,1,1,0.25
+eb9615cd,Alex Nankivell,Chiefs,32,8,0,0.25
+46915626,Ray Nu'u,Melbourne Rebels,8,2,1,0.25
+91766942,Julian Savea,Moana Pasifika,40,10,0,0.25
+e229122c,Peter Lakai,Hurricanes,24,6,2,0.25
+051ff2d5,Jordi Viljoen,Hurricanes,4,1,1,0.25
+a8b6abc1,Bailyn Sullivan,Hurricanes,28,7,0,0.25
+208a8b37,Jack Bowen,New South Wales Waratahs,4,1,1,0.25
+0dfa4c42,Jake McIntyre,Western Force,16,4,2,0.25
+6e3e816c,Filipo Daugunu,Melbourne Rebels,37,9,1,0.24
+e0777ce8,Lukas Ripley,Rebels,21,5,1,0.24
+04e70e57,Scott Gregory,Highlanders,21,5,0,0.24
+09d4cedc,Billy Pollard,Brumbies,33,8,3,0.24
+941c69fa,Alex Newsome,New South Wales Waratahs,17,4,0,0.24
+eef777b0,Jordie Barrett,Hurricanes,42,10,1,0.24
+e9440cf1,Noah Hotham,Crusaders,21,5,4,0.24
+787ae5b3,Sione Havili Talitui,Moana Pasifika,29,7,0,0.24
+f87eaf84,Pete Samu,Waratahs,33,8,1,0.24
+4f0c91b5,Christian Lio-Willie,Crusaders,31,7,1,0.23
+86a0d3b2,Finlay Christie,Blues,43,10,1,0.23
+20467cfe,Ryan Louwrens,Melbourne Rebels,31,7,0,0.23
+f30f87e9,Anton Lienert-Brown,Chiefs,30,7,1,0.23
+f2fd8d8d,Alex Mafi,Melbourne Rebels,26,6,0,0.23
+d7c5d246,Joseva Tamani,Fijian Drua,37,8,2,0.22
+a760045b,Cullen Grace,Crusaders,37,8,0,0.22
+8fd414d8,Harry Potter,Waratahs,9,2,0,0.22
+88cfec57,Brad Shields,Hurricanes,9,2,1,0.22
+37feea31,Dalton Papali'i,Blues,45,10,2,0.22
+bf368581,Rieko Ioane,Blues,45,10,0,0.22
+0e281d30,Samisoni Taukei'aho,Chiefs,51,11,3,0.22
+91e67b0b,Patrick Tuipulotu,Blues,23,5,0,0.22
+5b767336,Brad Wilkin,Melbourne Rebels,37,8,0,0.22
+4800cfc9,Fergus Burke,Crusaders,32,7,1,0.22
+c5a18a3b,Apisalome Vota,Fijian Drua,37,8,1,0.22
+1fcfba16,Timoci Sauvoli,Fijian Drua,9,2,2,0.22
+422565a4,Andrew Makalio,Highlanders,27,6,0,0.22
+2bad4e58,Gareth Simpson,Western Force,9,2,2,0.22
+73042f8c,Chase Tiatia,Western Force,46,10,1,0.22
+de6adf3f,Reece Hodge,Melbourne Rebels,28,6,1,0.21
+bd494ac3,Elia Canakaivata,Fijian Drua,42,9,0,0.21
+4147f816,Anzelo Tuitavuki,Moana Pasifika,14,3,2,0.21
+29557f10,Du'Plessis Kirifi,Hurricanes,42,9,3,0.21
+ec125d1d,Dallas McLeod,Crusaders,29,6,3,0.21
+ad18f2af,Akira Ioane,Blues,34,7,2,0.21
+d6e4e11c,Sama Malolo,Moana Pasifika,14,3,1,0.21
+b3102c5a,Damian McKenzie,Chiefs,35,7,0,0.2
+7e7e1b15,Shilo Klein,Crusaders,5,1,1,0.2
+d63dbd22,Julian Heaven,New South Wales Waratahs,10,2,2,0.2
+5b6751e6,Quinn Tupaea,Chiefs,35,7,1,0.2
+56ee6704,Tom Horton,Western Force,44,9,0,0.2
+e43307c5,Michael McDonald,Western Force,5,1,1,0.2
+afc23150,PJ Sheck,Blues,5,1,1,0.2
+5c2b65c4,Josh Jacomb,Chiefs,5,1,1,0.2
+3b62ca88,Kaylum Boshier,Chiefs,35,7,0,0.2
+d24c1d5d,Brad Lacey,Western Force,5,1,1,0.2
+683c4a2f,Henry Time-Stowers,Moana Pasifika,10,2,1,0.2
+741fb986,Hugh Renton,Highlanders,30,6,0,0.2
+8b6f7c12,Mason Gordon,Rebels,5,1,1,0.2
+6901629d,Isikeli Rabitu,Fijian Drua,5,1,1,0.2
+2b9c80dd,Luke Reimer,Brumbies,43,8,2,0.19
+1f7cdb9e,Taufa Funaki,Blues,31,6,0,0.19
+25490179,Tyrone Thompson,Chiefs,26,5,1,0.19
+71da9b25,Folau Fakatava,Highlanders,52,10,0,0.19
+ae1b3a66,Cameron Millar,Highlanders,16,3,1,0.19
+64612d8a,Josh Timu,Highlanders,16,3,0,0.19
+3947f886,Kalaveti Ravouvou,Fijian Drua,36,7,1,0.19
+093d44ec,Hudson Creighton,Brumbies,16,3,0,0.19
+390afb3b,Jackson Hughan,Western Force,16,3,1,0.19
+b1e61d93,Rhys Marshall,Highlanders,21,4,0,0.19
+b199b714,Josh Kemeny,Melbourne Rebels,27,5,0,0.19
+ab9d2533,Michael Wells,Western Force,37,7,1,0.19
+2304cfc7,Stephen Perofeta,Blues,44,8,0,0.18
+feebcbdb,Izaia Perese,New South Wales Waratahs,40,7,1,0.18
+143c1fdd,Ofa Tu'ungafasi,Blues,49,9,0,0.18
+6d225d3e,Brodie McAlister,Crusaders,28,5,0,0.18
+022838b3,Harry Lloyd,New South Wales Waratahs,11,2,0,0.18
+7e2eb30c,Jahrome Brown,Chiefs,38,7,1,0.18
+e2e4d985,William Havili,Moana Pasifika,44,8,1,0.18
+8e5b5ba7,Devan Flanders,Hurricanes,34,6,1,0.18
+d8bb4c79,Josh Dickson,Highlanders,22,4,0,0.18
+36afc0f9,Dan Cole,Hurricanes,17,3,0,0.18
+b865a161,Willi Heinz,Crusaders,17,3,0,0.18
+d73f92ad,Bryn Hall,Crusaders,17,3,1,0.18
+9a022a53,Epeli Momo,Fijian Drua,18,3,0,0.17
+8767fe2a,George Bell,Crusaders,18,3,0,0.17
+d7ed48e6,Ryan Crotty,Crusaders,6,1,1,0.17
+91c764d8,Sam Carter,Western Force,6,1,1,0.17
+67e62b36,Tupou Vaa'i,Chiefs,46,8,1,0.17
+99650951,Iliesa Junior Ratuva,Fijian Drua,6,1,0,0.17
+39952e78,Maciu Nabolakasi,Melbourne Rebels,12,2,0,0.17
+d9542f1c,Angelo Smith,Melbourne Rebels,23,4,1,0.17
+fd886e94,David Havili,Crusaders,35,6,0,0.17
+6eca5ee8,Matt Philip,Waratahs,18,3,0,0.17
+88d1d1d1,Lawson Creighton,Waratahs,36,6,3,0.17
+9295da35,Xavier Numia,Hurricanes,41,7,1,0.17
+fdef6fe9,Lalakai Foketi,New South Wales Waratahs,36,6,0,0.17
+d1d98b3f,Raymond Tuputupu,Hurricanes,6,1,1,0.17
+1cbe8c89,Alamanda Motuga,Moana Pasifika,24,4,1,0.17
+373fe496,Taniela Tupou,Melbourne Rebels,25,4,0,0.16
+03b3311c,Ryan Smith,Queensland Reds,45,7,0,0.16
+8c3b9e62,Charlie Gamble,Waratahs,45,7,0,0.16
+6d912387,Josh Ioane,Chiefs,37,6,2,0.16
+6cae428d,Brodie Retallick,Chiefs,25,4,1,0.16
+1c91b7c1,Will Harris,Force,45,7,0,0.16
+558a3757,Asafo Aumua,Hurricanes,38,6,2,0.16
+4bdf7dd9,Vaiolini Ekuasi,Force,31,5,1,0.16
+17a768b7,Braydon Ennor,Crusaders,31,5,2,0.16
+8efb9a6e,Aidan Morgan,Hurricanes,27,4,0,0.15
+462d3666,Thomas Umaga-Jensen,Highlanders,27,4,1,0.15
+a5eee03f,Cole Forbes,Blues,20,3,0,0.15
+59ed7320,Angus Ta'avao,Highlanders,39,6,1,0.15
+1d7c7c33,Simon Parker,Chiefs,20,3,1,0.15
+a41e647d,Chay Fihaki,Crusaders,34,5,1,0.15
+351a2b6d,Bayley Kuenzle,Force,40,6,3,0.15
+57263ae5,Tom Robertson,Force,27,4,0,0.15
+1838bbeb,Richie Mo'unga,Crusaders,27,4,2,0.15
+93b862f1,Marino Mikaele-Tu'u,Highlanders,26,4,0,0.15
+f3f97623,Bryce Heem,Blues,40,6,1,0.15
+c4386ac3,Langi Gleeson,New South Wales Waratahs,34,5,1,0.15
+0f14dcde,Cameron Suafoa,Blues,29,4,0,0.14
+b4eb9298,Declan Meredith,Brumbies,14,2,2,0.14
+70a6703e,Aaron Smith,Highlanders,28,4,2,0.14
+bb352212,Connal McInerney,Brumbies,21,3,0,0.14
+0d20acd9,Will Harrison,New South Wales Waratahs,14,2,0,0.14
+fe9c8cb6,Melani Matavao,Moana Pasifika,7,1,1,0.14
+76a79d22,Brett Herron,Hurricanes,21,3,1,0.14
+9b6e65f5,Danny Toala,Moana Pasifika,35,5,0,0.14
+221e8f0f,Lotu Inisi,Moana Pasifika,22,3,0,0.14
+d90642dd,Bryn Gatland,Chiefs,29,4,0,0.14
+0ae89327,Ned Hanigan,New South Wales Waratahs,22,3,1,0.14
+538a4d01,Cabous Eloff,Melbourne Rebels,28,4,0,0.14
+77c8303a,Tamati Tua,Brumbies,36,5,0,0.14
+c23c7e17,Peniasi Malimali,Chiefs,7,1,1,0.14
+972f522b,Taleni Seu,New South Wales Waratahs,14,2,1,0.14
+2498e30c,Samiuela Moli,Moana Pasifika,43,6,0,0.14
+60962f87,Justin Sangster,Hurricanes,28,4,0,0.14
+c661f723,Wallace Sititi,Chiefs,14,2,1,0.14
+83bd2b2c,Caleb Tangitau,Highlanders,7,1,1,0.14
+7f724bea,Kianu Kereru-Symes,Hurricanes,7,1,0,0.14
+f1967ac5,Matt Whaanga,Highlanders,7,1,1,0.14
+2d2cc60e,Te Toiroa Tahuriorangi,Chiefs,15,2,2,0.13
+174f0120,Connor Garden-Bachop,Highlanders,38,5,2,0.13
+48a3f936,Teddy Wilson,Waratahs,15,2,1,0.13
+a5564234,David Feliuai,Brumbies,23,3,0,0.13
+6e5673e8,Seru Uru,Reds,38,5,2,0.13
+fbc494f8,Jeff Toomaga-Allen,Reds,15,2,0,0.13
+a38f1700,Stacey Ili,Melbourne Rebels,23,3,1,0.13
+1967a6d3,Pone Fa'amausili,Melbourne Rebels,23,3,0,0.13
+231458f9,Henry Taefu,Moana Pasifika,31,4,0,0.13
+98802622,Michael Ruru,Moana Pasifika,23,3,0,0.13
+a59bcdf8,Jordan Uelese,Melbourne Rebels,38,5,0,0.13
+501a06e6,Nick Jooste,Melbourne Rebels,30,4,0,0.13
+98be51d6,Rameka Poihipi,Chiefs,46,6,0,0.13
+c317fd5b,Tyrel Lomax,Hurricanes,41,5,0,0.12
+e40a139d,Monty Ioane,Melbourne Rebels,16,2,1,0.12
+0bb9cf58,Jake Strachan,Rebels,33,4,0,0.12
+fdd02ed7,Rusiate Nasove,Fijian Drua,8,1,0,0.12
+f47a7f24,Chris Apoua,Moana Pasifika,17,2,0,0.12
+f994e844,Jacob Devery,Hurricanes,8,1,1,0.12
+f3d48ecd,Nephi Leatigaga,New South Wales Waratahs,8,1,1,0.12
+e6e668e5,Luke Romano,Blues,16,2,1,0.12
+7feb1412,Hunter Paisami,Reds,32,4,1,0.12
+6cfa0c9d,Ruben Love,Hurricanes,26,3,0,0.12
+28893440,Kaleb Trask,Chiefs,8,1,1,0.12
+14d8c7bb,Joe Brial,Reds,8,1,1,0.12
+e3089d08,George Bridge,Force,17,2,0,0.12
+1ab6004f,Solomone Kata,Moana Pasifika,8,1,0,0.12
+e65f3a4d,Nick Frost,Brumbies,50,6,1,0.12
+fd2666f4,Tolu Latu,New South Wales Waratahs,8,1,1,0.12
+adcf9cf3,Mitchell Hunt,Highlanders,26,3,0,0.12
+a524a73c,Ethan de Groot,Highlanders,42,5,0,0.12
+3fad3780,Mitch Hunt,Highlanders,25,3,0,0.12
+30e90cee,Kitione Salawa,Fijian Drua,43,5,1,0.12
+231b684c,Dan Lienert-Brown,Highlanders,25,3,1,0.12
+dc8ce071,Sam Spink,Western Force,26,3,0,0.12
+a861c1dd,Reesjan Pasitoa,Highlanders,18,2,0,0.11
+fae6eb92,Ryan Lonergan,Brumbies,55,6,1,0.11
+3c331592,Corey Evans,Blues,19,2,0,0.11
+4f2dfee5,Sam Cane,Chiefs,28,3,0,0.11
+fcdc0a51,Tamaiti Williams,Crusaders,38,4,0,0.11
+0027b709,Ezekiel Lindenmuth,Moana Pasifika,27,3,2,0.11
+b1399b54,Joe Apikotoa,Moana Pasifika,18,2,0,0.11
+945b5db5,Rory Scott,Brumbies,28,3,0,0.11
+79e02db8,Tane Edmed,Brumbies,36,4,1,0.11
+2d280c7b,Pasilio Tosi,Hurricanes,27,3,1,0.11
+4beba29a,Joey Walton,Waratahs,27,3,1,0.11
+524fbf64,Sean Withy,Highlanders,36,4,0,0.11
+4d6201f4,Christian Leali'ifano,Moana Pasifika,36,4,0,0.11
+8f3d165c,Peni Ravai,Fijian Drua,29,3,0,0.1
+328111b3,Max Burey,Force,20,2,0,0.1
+aed49c58,Hamish Stewart,Force,49,5,0,0.1
+0e11f316,Luke Jacobson,Chiefs,49,5,0,0.1
+f74b4d1d,Billy Harmon,Highlanders,40,4,0,0.1
+bcaa5490,Xavier Roe,Chiefs,29,3,0,0.1
+cb669472,Karl Tu'inukuafe,Blues,10,1,1,0.1
+8cfa16f9,Bradley Slater,Blues,42,4,1,0.1
+36c0d9c4,Fergus Lee-Warner,New South Wales Waratahs,30,3,0,0.1
+f1ef656b,Roger Tuivasa-Sheck,Blues,20,2,1,0.1
+52746ec1,Luteru Tolai,Moana Pasifika,21,2,0,0.1
+312bad5d,Reed Prinsep,Western Force,21,2,1,0.1
+e9470ae1,Ratu Rotuisolia,Fijian Drua,39,4,0,0.1
+2e462770,Neria Fomai,Moana Pasifika,20,2,0,0.1
+c2462e3c,Tom Franklin,Western Force,11,1,0,0.09
+8f3971b3,Samipeni Finau,Chiefs,45,4,1,0.09
+6773ed3a,Ollie Sapsford,Brumbies,44,4,1,0.09
+1ac247d9,Sione Mafile'o,Moana Pasifika,22,2,1,0.09
+c46e3bd9,Isaac Kailea,Waratahs,22,2,1,0.09
+02fce63f,Ricky Jackson,Highlanders,11,1,1,0.09
+794f978c,Shannon Frizell,Highlanders,22,2,1,0.09
+9f28cc6e,Quinten Strange,Crusaders,34,3,1,0.09
+58ebead2,Tau Koloamatangi,Moana Pasifika,11,1,0,0.09
+2d4c0b90,Nemani Nagusa,Fijian Drua,11,1,0,0.09
+7ab938d3,Nic White,Western Force,47,4,0,0.09
+bfe2a738,*Meli *Derenalagi,Fijian Drua,45,4,0,0.09
+6bb62aa2,Vilive Miramira,Fijian Drua,44,4,0,0.09
+6cfb125b,Liam Wright,Queensland Reds,33,3,0,0.09
+4ab10268,Angus Hall,New South Wales Waratahs,26,2,0,0.08
+3893c47e,Jack Debreczeni,Waratahs,26,2,0,0.08
+04fc39fd,Sione Tuipulotu,Moana Pasifika,12,1,1,0.08
+b409cd0c,Ajay Faleafaga,Highlanders,12,1,0,0.08
+8048c03b,Joe Pincus,Melbourne Rebels,12,1,0,0.08
+3180b4cd,Te Ahiwaru Cirikidaveta,Fijian Drua,39,3,0,0.08
+bb44b0e5,Tanielu Tele'a,Highlanders,24,2,1,0.08
+e981f8ae,Tuidraki Samusamuvodre,Fijian Drua,13,1,1,0.08
+62b0c27a,Jack Grant,New South Wales Waratahs,26,2,0,0.08
+9507765f,Harry Godfrey,Hurricanes,13,1,1,0.08
+58783e70,Josh Canham,Reds,37,3,2,0.08
+8cfb8dd9,Laghlan McWhannell,Blues,25,2,0,0.08
+46f43650,Soane Vikena,Blues,24,2,0,0.08
+ba90f4ae,Jeremy Williams,Force,36,3,0,0.08
+b594de0d,Nigel Ah Wong,Moana Pasifika,13,1,0,0.08
+f85c190d,Sekope Kepu,Moana Pasifika,25,2,1,0.08
+b1b18578,Mitchell Dunshea,Highlanders,13,1,0,0.08
+e52e94ac,Scott Barrett,Crusaders,36,3,0,0.08
+185a8776,Richard Judd,Hurricanes,13,1,1,0.08
+8c3faab5,Noah Lolesio,Brumbies,48,4,0,0.08
+31976b64,Jake Upfield,Queensland Reds,12,1,1,0.08
+014dfd7b,Daniel Lienert-Brown,Highlanders,41,3,0,0.07
+0f0cc9e5,Bo Abra,Western Force,14,1,0,0.07
+24616539,Jed Holloway,New South Wales Waratahs,42,3,1,0.07
+bda55438,Jackson Garden-Bachop,Hurricanes,14,1,0,0.07
+d2115276,Pepesana Patafilo,Moana Pasifika,15,1,0,0.07
+fd398c13,Fletcher Newell,Crusaders,29,2,0,0.07
+db26e55a,Dom Gardiner,Crusaders,28,2,0,0.07
+4c2d52d4,Ben Donaldson,Force,45,3,2,0.07
+6a14d36e,Tim Anstee,Western Force,42,3,0,0.07
+5807d531,James Blackwell,Hurricanes,28,2,0,0.07
+fca5a448,George Poolman,Western Force,28,2,1,0.07
+1a179bde,Michael Naitokani,Fijian Drua,14,1,0,0.07
+ef0ad45c,Fetuli Paea,Highlanders,27,2,0,0.07
+47d780db,Pablo Matera,Crusaders,15,1,0,0.07
+46d245d3,Cameron Orr,Melbourne Rebels,17,1,0,0.06
+9e47ab7b,Sam Talakai,Melbourne Rebels,31,2,0,0.06
+17001c56,Harry Hoopert,Western Force,18,1,0,0.06
+0fb75fc2,Ollie Allan,Western Force,33,2,0,0.06
+0d4db974,Pari Pari Parkinson,Highlanders,17,1,0,0.06
+f69ffe43,Rahboni Vosayaco,Force,16,1,0,0.06
+49f7b683,Triston Reilly,Waratahs,16,1,0,0.06
+a61841a2,Alex McRobbie,Moana Pasifika,17,1,0,0.06
+e071b3b4,Rivez Reihana,Crusaders,17,1,0,0.06
+5b49cd0a,Rahboni Warren,Western Force,18,1,0,0.06
+885f6a21,Riley Higgins,Hurricanes,16,1,0,0.06
+3fdc6cd7,Allan Alaalatoa,Brumbies,33,2,1,0.06
+b3c63599,Zane Nonggorr,Reds,35,2,0,0.06
+e078aa86,Felix Kalapu,Western Force,17,1,1,0.06
+5d5d1433,Caleb Delany,Hurricanes,34,2,0,0.06
+8b00ba9e,Allan Craig,Moana Pasifika,17,1,0,0.06
+deb812c4,Jacob Norris,Moana Pasifika,16,1,0,0.06
+379dd071,Tom Christie,Crusaders,48,3,0,0.06
+ef6898a2,Marcel Renata,Blues,43,2,0,0.05
+c0764cad,Corey Kellow,Crusaders,20,1,1,0.05
+7c2a2c03,Saula Ma'u,Highlanders,43,2,0,0.05
+0f3a5e6c,Rhys Van Nek,Brumbies,37,2,2,0.05
+b87db9fa,Lopeti Faifua,Western Force,20,1,1,0.05
+ace3bd2a,Mitchell Drummond,Crusaders,42,2,0,0.05
+16a78d5b,Oli Jager,Crusaders,19,1,1,0.05
+695d2cad,Hugh Sinclair,New South Wales Waratahs,41,2,1,0.05
+c62dab70,Matt Gibbon,Melbourne Rebels,42,2,0,0.05
+da230733,Sam Whitelock,Crusaders,21,1,0,0.05
+39639b8d,Harry Johnson-Holmes,Force,37,2,0,0.05
+3e4bf94a,Marley Pearce,Western Force,20,1,0,0.05
+0f5b7fb4,Isaia Walker-Leawere,Hurricanes,37,2,0,0.05
+46132b23,James O'Reilly,Hurricanes,20,1,0,0.05
+d523c34c,George Dyer,Chiefs,43,2,0,0.05
+9685875c,Peter Umaga-Jensen,Hurricanes,22,1,0,0.05
+80f17da4,Tom Robertson,Western Force,23,1,0,0.04
+98ebdeb5,Jermaine Ainsley,Highlanders,49,2,0,0.04
+1a4d5770,Max Hicks,Highlanders,25,1,0,0.04
+3d54fa64,Simione Kuruvoli,Fijian Drua,25,1,0,0.04
+5c80b5b2,Joe Moody,Crusaders,28,1,0,0.04
+07c2b2e1,James Lentjes,Highlanders,23,1,0,0.04
+fb0de664,Richie Asiata,Reds,24,1,0,0.04
+4f602eec,Aidan Ross,Reds,49,2,1,0.04
+b89aba9d,Harrison Goddard,Brumbies,26,1,0,0.04
+da2c73c0,James Slipper,Brumbies,49,2,0,0.04
+19b0767b,Mesake Doge,Fijian Drua,28,1,0,0.04
+6358cc82,Fabian Holland,Highlanders,26,1,1,0.04
+38592619,Darcy Swain,Force,46,2,0,0.04
+0c1d398a,Connor Sa,Queensland Reds,24,1,0,0.04
+6114adbe,Manaaki Selby-Rickit,Chiefs,26,1,0,0.04
+e4cf04fb,James O'Connor,Queensland Reds,27,1,0,0.04
+e56f20b3,James Tucker,Hurricanes,33,1,0,0.03
+d9da1068,Jamie Booth,Hurricanes,31,1,0,0.03
+48407a01,Nepo Laulala,Blues,29,1,1,0.03
+4c8d9133,Owen Franks,Crusaders,29,1,1,0.03
+e54a0143,Teti Tela,Fijian Drua,34,1,0,0.03
+48431fa1,Pouri Rakete-Stones,Hurricanes,32,1,0,0.03
+58b61171,Sef Fa'agase,Force,31,1,0,0.03
+0a6a57d6,Tuaina Taii Tualima,Melbourne Rebels,29,1,0,0.03
+525e1435,Mesulame Dolokoto,Fijian Drua,36,1,0,0.03
+3d7d9880,Kemu Valetini,Fijian Drua,30,1,0,0.03
+1a4647eb,Tevita Mafile'o,Hurricanes,39,1,0,0.03
+a6ea2f7c,Sefo Kautai,Brumbies,39,1,0,0.03
+e9d18cb8,Santiago Medrano,Western Force,47,1,0,0.02
+3740a40f,Ollie Norris,Chiefs,45,1,0,0.02
+837259f9,Issak Fines-Leleiwasa,Fijian Drua,45,1,1,0.02
+8878d5d5,Peni Matawalu,Fijian Drua,52,1,0,0.02
+92a8e5e7,Naitoa Ah Kuoi,Chiefs,51,1,0,0.02
+a6856c5c,Isoa Nasilasila,Fijian Drua,53,1,0,0.02
+96cb3034,Sam Nock,Blues,43,1,0,0.02

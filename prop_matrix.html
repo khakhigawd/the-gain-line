@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>The Gain Line  Super Rugby Pacific</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #0a0a0a; color: #ffffff; }
+.header { background: #111; border-bottom: 2px solid #222; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+.logo { font-size: 22px; font-weight: bold; color: #fff; letter-spacing: 1px; }
+.logo span { color: #4CAF50; }
+.nav-tabs { display: flex; gap: 5px; }
+.nav-tab { padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 13px; background: #1a1a1a; color: #888; border: 1px solid #333; }
+.nav-tab.active { background: #4CAF50; color: #fff; border-color: #4CAF50; }
+.controls { display: flex; gap: 10px; padding: 15px 20px; background: #0f0f0f; border-bottom: 1px solid #222; flex-wrap: wrap; align-items: center; }
+.control-group { display: flex; flex-direction: column; gap: 4px; }
+.control-label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+select, input { background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 5px; padding: 8px 12px; font-size: 13px; cursor: pointer; }
+select:focus, input:focus { outline: none; border-color: #4CAF50; }
+.search-box { flex: 1; min-width: 200px; }
+.container { padding: 20px; max-width: 1400px; margin: 0 auto; }
+.matrix-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+.matrix-subtitle { font-size: 12px; color: #666; margin-bottom: 15px; }
+table { width: 100%; border-collapse: collapse; }
+th { background: #1a1a1a; padding: 10px 12px; text-align: center; font-size: 11px; color: #888; letter-spacing: 1px; border-bottom: 2px solid #333; text-transform: uppercase; position: sticky; top: 0; z-index: 10; }
+th.left { text-align: left; }
+td { padding: 10px 12px; text-align: center; border-bottom: 1px solid #151515; font-size: 14px; }
+.player-name { text-align: left; font-weight: bold; font-size: 14px; }
+.team-badge { font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 3px; white-space: nowrap; display: inline-block; }
+.matrix-cell { font-weight: bold; font-size: 16px; border-radius: 4px; padding: 8px 12px; display: inline-block; min-width: 55px; }
+.career-cell { font-weight: bold; font-size: 15px; border-radius: 4px; padding: 6px 10px; display: inline-block; min-width: 50px; }
+tr:hover { background: #111; }
+.section-header td { background: #0f0f0f; color: #fff; font-weight: bold; font-size: 12px; letter-spacing: 2px; padding: 8px 12px; border-top: 2px solid #333; text-transform: uppercase; }
+.stats-small { font-size: 11px; color: #666; display: block; }
+.legend { display: flex; gap: 20px; justify-content: center; margin: 15px 0; font-size: 12px; color: #888; }
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-box { width: 12px; height: 12px; border-radius: 2px; }
+.footer { text-align: center; color: #333; font-size: 11px; padding: 20px; border-top: 1px solid #111; margin-top: 20px; }
+.count-badge { background: #333; color: #888; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">THE <span>GAIN</span> LINE</div>
+  <div class="nav-tabs">
+<div class="nav-tab active" onclick="location.href='prop_matrix.html'">Super Rugby Pacific</div>
+<div class="nav-tab" onclick="location.href='epl_matrix.html'">EPL Soccer</div>
+<div class="nav-tab" onclick="location.href='tennis_matrix.html'">ATP Tennis</div>
+<div class="nav-tab" onclick="location.href='wta_matrix.html'">WTA Tennis</div>
+</div>
+    <div class="nav-tab">EPL Soccer</div>
+    <div class="nav-tab">Tennis</div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="control-group">
+    <span class="control-label">Team</span>
+    <select id="teamFilter" onchange="renderTable()">
+      <option value="all">All Teams</option>
+    </select>
+  </div>
+  <div class="control-group">
+    <span class="control-label">Game Count</span>
+    <select id="gameCount" onchange="renderTable()">
+      <option value="last5">Last 5 Games</option>
+      <option value="last10">Last 10 Games</option>
+      <option value="last15">Last 15 Games</option>
+      <option value="season">Full Season</option>
+    </select>
+  </div>
+  <div class="control-group">
+    <span class="control-label">Sort By</span>
+    <select id="sortBy" onchange="renderTable()">
+      <option value="team">Team</option>
+      <option value="career">Career Rate</option>
+      <option value="recent">Recent Form</option>
+      <option value="metres">Avg Metres</option>
+    </select>
+  </div>
+  <div class="control-group search-box">
+    <span class="control-label">Search Player</span>
+    <input type="text" id="searchBox" placeholder="Search player name..." oninput="renderTable()">
+  </div>
+</div>
+
+<div class="container">
+  <div class="matrix-title">Try Scorer Matrix <span class="count-badge" id="playerCount"></span></div>
+  <div class="matrix-subtitle">Player try scoring performance | Color coded by hit rate | Updated Daily</div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-box" style="background:#1a7a1a"></div>60%+ hit rate</div>
+    <div class="legend-item"><div class="legend-box" style="background:#7a6a00"></div>40-59% hit rate</div>
+    <div class="legend-item"><div class="legend-box" style="background:#7a1a1a"></div>Under 40% hit rate</div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="left">PLAYER</th>
+        <th>TEAM</th>
+        <th>AVG METRES</th>
+        <th>AVG DEF BEATEN</th>
+        <th>ANYTIME TRY (1+)</th>
+        <th>BRACE (2+)</th>
+        <th>CAREER RATE</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <div class="footer">The Gain Line | Super Rugby Pacific | Data updated daily | Built for the American rugby bettor</div>
+</div>
+
+<script>
+const playerData = [
+  {
+    name: "Sevu Reece",
+    team: "Crusaders",
+    teamColor: "#E31937",
+    careerRate: 0.74,
+    totalGames: 35,
+    last5: {h1:3,h2:1,t:5,avgMetres:50.2,avgDef:3.2},
+    last10: {h1:6,h2:2,t:10,avgMetres:49.8,avgDef:2.9},
+    last15: {h1:10,h2:3,t:15,avgMetres:51.2,avgDef:3.3},
+    season: {h1:20,h2:6,t:35,avgMetres:46.2,avgDef:2.7},
+  },
+  {
+    name: "Leicester Faingaanuku",
+    team: "Crusaders",
+    teamColor: "#E31937",
+    careerRate: 0.72,
+    totalGames: 32,
+    last5: {h1:2,h2:1,t:5,avgMetres:66.0,avgDef:3.2},
+    last10: {h1:4,h2:2,t:10,avgMetres:68.9,avgDef:2.8},
+    last15: {h1:8,h2:4,t:15,avgMetres:67.8,avgDef:3.3},
+    season: {h1:14,h2:6,t:32,avgMetres:59.3,avgDef:2.8},
+  },
+  {
+    name: "Will Jordan",
+    team: "Crusaders",
+    teamColor: "#E31937",
+    careerRate: 0.64,
+    totalGames: 22,
+    last5: {h1:3,h2:0,t:5,avgMetres:83.0,avgDef:3.8},
+    last10: {h1:4,h2:0,t:10,avgMetres:89.7,avgDef:4.0},
+    last15: {h1:8,h2:1,t:15,avgMetres:94.9,avgDef:4.1},
+    season: {h1:12,h2:1,t:22,avgMetres:96.3,avgDef:4.3},
+  },
+  {
+    name: "Macca Springer",
+    team: "Crusaders",
+    teamColor: "#E31937",
+    careerRate: 0.35,
+    totalGames: 20,
+    last5: {h1:2,h2:0,t:5,avgMetres:51.4,avgDef:2.2},
+    last10: {h1:3,h2:0,t:10,avgMetres:47.5,avgDef:1.6},
+    last15: {h1:6,h2:1,t:15,avgMetres:44.2,avgDef:1.6},
+    season: {h1:6,h2:1,t:20,avgMetres:38.1,avgDef:1.5},
+  },
+  {
+    name: "Wes Goosen",
+    team: "Hurricanes",
+    teamColor: "#003087",
+    careerRate: 0.62,
+    totalGames: 13,
+    last5: {h1:2,h2:2,t:5,avgMetres:43.2,avgDef:2.4},
+    last10: {h1:5,h2:2,t:10,avgMetres:41.3,avgDef:2.2},
+    last15: {h1:6,h2:2,t:13,avgMetres:41.7,avgDef:2.5},
+    season: {h1:6,h2:2,t:13,avgMetres:41.7,avgDef:2.5},
+  },
+  {
+    name: "Joshua Moorby",
+    team: "Hurricanes",
+    teamColor: "#003087",
+    careerRate: 0.57,
+    totalGames: 42,
+    last5: {h1:2,h2:0,t:5,avgMetres:39.8,avgDef:1.8},
+    last10: {h1:4,h2:0,t:10,avgMetres:49.7,avgDef:1.6},
+    last15: {h1:6,h2:1,t:15,avgMetres:50.9,avgDef:1.9},
+    season: {h1:17,h2:5,t:42,avgMetres:55.8,avgDef:2.1},
+  },
+  {
+    name: "Salesi Rayasi",
+    team: "Hurricanes",
+    teamColor: "#003087",
+    careerRate: 0.57,
+    totalGames: 40,
+    last5: {h1:1,h2:1,t:5,avgMetres:53.4,avgDef:3.6},
+    last10: {h1:3,h2:3,t:10,avgMetres:50.0,avgDef:2.9},
+    last15: {h1:4,h2:3,t:15,avgMetres:39.1,avgDef:2.3},
+    season: {h1:15,h2:6,t:40,avgMetres:53.9,avgDef:2.9},
+  },
+  {
+    name: "Ardie Savea",
+    team: "Hurricanes",
+    teamColor: "#003087",
+    careerRate: 0.44,
+    totalGames: 27,
+    last5: {h1:2,h2:1,t:5,avgMetres:36.8,avgDef:3.8},
+    last10: {h1:3,h2:1,t:10,avgMetres:32.6,avgDef:3.1},
+    last15: {h1:5,h2:2,t:15,avgMetres:35.1,avgDef:3.2},
+    season: {h1:9,h2:2,t:27,avgMetres:37.4,avgDef:2.9},
+  },
+  {
+    name: "Caleb Clarke",
+    team: "Blues",
+    teamColor: "#0047AB",
+    careerRate: 0.64,
+    totalGames: 44,
+    last5: {h1:3,h2:2,t:5,avgMetres:69.6,avgDef:2.2},
+    last10: {h1:5,h2:2,t:10,avgMetres:74.8,avgDef:3.1},
+    last15: {h1:7,h2:2,t:15,avgMetres:86.5,avgDef:3.3},
+    season: {h1:24,h2:3,t:44,avgMetres:73.0,avgDef:3.5},
+  },
+  {
+    name: "Mark Telea",
+    team: "Blues",
+    teamColor: "#0047AB",
+    careerRate: 0.58,
+    totalGames: 50,
+    last5: {h1:1,h2:0,t:5,avgMetres:32.2,avgDef:1.8},
+    last10: {h1:4,h2:2,t:10,avgMetres:64.3,avgDef:4.0},
+    last15: {h1:7,h2:3,t:15,avgMetres:69.5,avgDef:4.3},
+    season: {h1:19,h2:6,t:50,avgMetres:69.6,avgDef:4.7},
+  },
+  {
+    name: "Hoskins Sotutu",
+    team: "Blues",
+    teamColor: "#0047AB",
+    careerRate: 0.44,
+    totalGames: 50,
+    last5: {h1:2,h2:1,t:5,avgMetres:32.0,avgDef:1.0},
+    last10: {h1:4,h2:2,t:10,avgMetres:44.5,avgDef:1.8},
+    last15: {h1:5,h2:2,t:15,avgMetres:45.7,avgDef:1.9},
+    season: {h1:16,h2:5,t:50,avgMetres:42.8,avgDef:2.2},
+  },
+  {
+    name: "Rieko Ioane",
+    team: "Blues",
+    teamColor: "#0047AB",
+    careerRate: 0.22,
+    totalGames: 45,
+    last5: {h1:0,h2:0,t:5,avgMetres:20.4,avgDef:2.0},
+    last10: {h1:0,h2:0,t:10,avgMetres:27.0,avgDef:1.2},
+    last15: {h1:0,h2:0,t:15,avgMetres:28.9,avgDef:1.2},
+    season: {h1:7,h2:2,t:45,avgMetres:43.9,avgDef:2.0},
+  },
+  {
+    name: "Corey Toole",
+    team: "Brumbies",
+    teamColor: "#00305E",
+    careerRate: 0.66,
+    totalGames: 32,
+    last5: {h1:2,h2:0,t:5,avgMetres:51.8,avgDef:1.6},
+    last10: {h1:4,h2:0,t:10,avgMetres:40.8,avgDef:1.5},
+    last15: {h1:7,h2:1,t:15,avgMetres:43.5,avgDef:2.6},
+    season: {h1:17,h2:4,t:32,avgMetres:50.8,avgDef:2.3},
+  },
+  {
+    name: "Charlie Cale",
+    team: "Brumbies",
+    teamColor: "#00305E",
+    careerRate: 0.5,
+    totalGames: 16,
+    last5: {h1:2,h2:1,t:5,avgMetres:34.8,avgDef:1.8},
+    last10: {h1:4,h2:1,t:10,avgMetres:36.5,avgDef:1.3},
+    last15: {h1:6,h2:2,t:15,avgMetres:35.3,avgDef:1.0},
+    season: {h1:6,h2:2,t:16,avgMetres:33.1,avgDef:0.9},
+  },
+  {
+    name: "Tom Wright",
+    team: "Brumbies",
+    teamColor: "#00305E",
+    careerRate: 0.48,
+    totalGames: 52,
+    last5: {h1:3,h2:2,t:5,avgMetres:83.8,avgDef:4.8},
+    last10: {h1:3,h2:2,t:10,avgMetres:78.9,avgDef:3.9},
+    last15: {h1:7,h2:4,t:15,avgMetres:77.1,avgDef:3.5},
+    season: {h1:19,h2:6,t:52,avgMetres:69.7,avgDef:2.5},
+  },
+  {
+    name: "Jacob Ratumaitavuki",
+    team: "Highlanders",
+    teamColor: "#003087",
+    careerRate: 0.43,
+    totalGames: 35,
+    last5: {h1:2,h2:0,t:5,avgMetres:62.2,avgDef:2.8},
+    last10: {h1:4,h2:2,t:10,avgMetres:65.8,avgDef:2.2},
+    last15: {h1:7,h2:2,t:15,avgMetres:66.7,avgDef:2.6},
+    season: {h1:12,h2:3,t:35,avgMetres:49.7,avgDef:2.4},
+  },
+  {
+    name: "Jonah Lowe",
+    team: "Highlanders",
+    teamColor: "#003087",
+    careerRate: 0.39,
+    totalGames: 31,
+    last5: {h1:1,h2:0,t:5,avgMetres:23.0,avgDef:1.2},
+    last10: {h1:1,h2:0,t:10,avgMetres:22.1,avgDef:1.3},
+    last15: {h1:3,h2:0,t:15,avgMetres:31.5,avgDef:1.2},
+    season: {h1:7,h2:3,t:31,avgMetres:30.4,avgDef:1.2},
+  },
+  {
+    name: "Jona Nareki",
+    team: "Highlanders",
+    teamColor: "#003087",
+    careerRate: 0.35,
+    totalGames: 20,
+    last5: {h1:3,h2:2,t:5,avgMetres:71.8,avgDef:3.0},
+    last10: {h1:3,h2:2,t:10,avgMetres:63.1,avgDef:3.2},
+    last15: {h1:4,h2:2,t:15,avgMetres:55.3,avgDef:2.7},
+    season: {h1:5,h2:2,t:20,avgMetres:49.9,avgDef:2.5},
+  },
+  {
+    name: "Tim Ryan",
+    team: "Reds",
+    teamColor: "#C8102E",
+    careerRate: 0.91,
+    totalGames: 11,
+    last5: {h1:2,h2:1,t:5,avgMetres:54.0,avgDef:3.0},
+    last10: {h1:5,h2:3,t:10,avgMetres:53.6,avgDef:2.9},
+    last15: {h1:5,h2:3,t:11,avgMetres:48.7,avgDef:2.6},
+    season: {h1:5,h2:3,t:11,avgMetres:48.7,avgDef:2.6},
+  },
+  {
+    name: "Josh Flook",
+    team: "Reds",
+    teamColor: "#C8102E",
+    careerRate: 0.41,
+    totalGames: 41,
+    last5: {h1:1,h2:0,t:5,avgMetres:36.4,avgDef:1.4},
+    last10: {h1:2,h2:0,t:10,avgMetres:29.9,avgDef:1.0},
+    last15: {h1:5,h2:1,t:15,avgMetres:32.0,avgDef:1.1},
+    season: {h1:13,h2:4,t:41,avgMetres:26.8,avgDef:0.9},
+  },
+  {
+    name: "Lachie Anderson",
+    team: "Reds",
+    teamColor: "#C8102E",
+    careerRate: 0.39,
+    totalGames: 31,
+    last5: {h1:2,h2:2,t:5,avgMetres:46.8,avgDef:2.2},
+    last10: {h1:3,h2:2,t:10,avgMetres:43.3,avgDef:1.2},
+    last15: {h1:5,h2:2,t:15,avgMetres:44.0,avgDef:1.5},
+    season: {h1:9,h2:3,t:31,avgMetres:44.0,avgDef:1.4},
+  },
+  {
+    name: "Mark Nawaqanitawase",
+    team: "Waratahs",
+    teamColor: "#00205B",
+    careerRate: 0.4,
+    totalGames: 42,
+    last5: {h1:1,h2:0,t:5,avgMetres:93.2,avgDef:4.8},
+    last10: {h1:1,h2:0,t:10,avgMetres:73.6,avgDef:3.3},
+    last15: {h1:1,h2:0,t:15,avgMetres:66.1,avgDef:3.0},
+    season: {h1:15,h2:2,t:42,avgMetres:54.9,avgDef:2.8},
+  },
+  {
+    name: "Folau Fainga'a",
+    team: "Waratahs",
+    teamColor: "#00205B",
+    careerRate: 0.43,
+    totalGames: 23,
+    last5: {h1:1,h2:1,t:5,avgMetres:19.6,avgDef:0.6},
+    last10: {h1:3,h2:1,t:10,avgMetres:12.7,avgDef:0.4},
+    last15: {h1:6,h2:1,t:15,avgMetres:12.3,avgDef:0.3},
+    season: {h1:9,h2:1,t:23,avgMetres:10.7,avgDef:0.3},
+  },
+  {
+    name: "Zach Kibirige",
+    team: "Western Force",
+    teamColor: "#002147",
+    careerRate: 0.8,
+    totalGames: 15,
+    last5: {h1:0,h2:0,t:5,avgMetres:20.2,avgDef:1.0},
+    last10: {h1:5,h2:3,t:10,avgMetres:45.9,avgDef:1.7},
+    last15: {h1:9,h2:3,t:15,avgMetres:39.8,avgDef:1.9},
+    season: {h1:9,h2:3,t:15,avgMetres:39.8,avgDef:1.9},
+  },
+  {
+    name: "Carlo Tizzano",
+    team: "Western Force",
+    teamColor: "#002147",
+    careerRate: 0.28,
+    totalGames: 29,
+    last5: {h1:3,h2:0,t:5,avgMetres:10.8,avgDef:0.4},
+    last10: {h1:4,h2:0,t:10,avgMetres:10.1,avgDef:0.4},
+    last15: {h1:6,h2:0,t:15,avgMetres:10.3,avgDef:0.6},
+    season: {h1:8,h2:0,t:29,avgMetres:12.7,avgDef:0.7},
+  },
+  {
+    name: "Iosefo Masi",
+    team: "Fijian Drua",
+    teamColor: "#00843D",
+    careerRate: 0.64,
+    totalGames: 44,
+    last5: {h1:2,h2:0,t:5,avgMetres:71.0,avgDef:6.8},
+    last10: {h1:2,h2:0,t:10,avgMetres:54.2,avgDef:5.5},
+    last15: {h1:4,h2:0,t:15,avgMetres:59.9,avgDef:5.4},
+    season: {h1:17,h2:7,t:44,avgMetres:58.2,avgDef:4.5},
+  },
+  {
+    name: "Taniela Rakuro",
+    team: "Fijian Drua",
+    teamColor: "#00843D",
+    careerRate: 0.5,
+    totalGames: 24,
+    last5: {h1:0,h2:0,t:5,avgMetres:24.6,avgDef:0.8},
+    last10: {h1:2,h2:2,t:10,avgMetres:30.3,avgDef:1.6},
+    last15: {h1:2,h2:2,t:15,avgMetres:34.9,avgDef:1.4},
+    season: {h1:8,h2:4,t:24,avgMetres:28.8,avgDef:1.3},
+  },
+  {
+    name: "Miracle Faiilagi",
+    team: "Moana Pasifika",
+    teamColor: "#003F87",
+    careerRate: 0.47,
+    totalGames: 19,
+    last5: {h1:2,h2:1,t:5,avgMetres:16.2,avgDef:1.8},
+    last10: {h1:3,h2:2,t:10,avgMetres:16.2,avgDef:1.4},
+    last15: {h1:4,h2:3,t:15,avgMetres:20.4,avgDef:1.5},
+    season: {h1:5,h2:3,t:19,avgMetres:29.4,avgDef:1.6},
+  },
+  {
+    name: "Fine Inisi",
+    team: "Moana Pasifika",
+    teamColor: "#003F87",
+    careerRate: 0.27,
+    totalGames: 37,
+    last5: {h1:3,h2:1,t:5,avgMetres:43.6,avgDef:1.4},
+    last10: {h1:3,h2:1,t:10,avgMetres:51.8,avgDef:2.5},
+    last15: {h1:3,h2:1,t:15,avgMetres:38.9,avgDef:2.0},
+    season: {h1:8,h2:2,t:37,avgMetres:27.4,avgDef:1.4},
+  },
+];
+
+
+function getColor(hits, total) {
+  if (total === 0) return '#333';
+  const rate = hits / total;
+  if (rate >= 0.6) return '#1a7a1a';
+  if (rate >= 0.4) return '#7a6a00';
+  return '#7a1a1a';
+}
+
+function getCareerColor(rate) {
+  if (rate >= 0.5) return '#1a7a1a';
+  if (rate >= 0.3) return '#7a6a00';
+  return '#7a1a1a';
+}
+
+function populateTeamFilter() {
+  const teams = [...new Set(playerData.map(p => p.team))].sort();
+  const select = document.getElementById('teamFilter');
+  teams.forEach(team => {
+    const opt = document.createElement('option');
+    opt.value = team;
+    opt.textContent = team;
+    select.appendChild(opt);
+  });
+}
+
+function renderTable() {
+  const teamFilter = document.getElementById('teamFilter').value;
+  const gameCount = document.getElementById('gameCount').value;
+  const sortBy = document.getElementById('sortBy').value;
+  const search = document.getElementById('searchBox').value.toLowerCase();
+
+  let filtered = playerData.filter(p => {
+    if (teamFilter !== 'all' && p.team !== teamFilter) return false;
+    if (search && !p.name.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  if (sortBy === 'career') filtered.sort((a, b) => b.careerRate - a.careerRate);
+  else if (sortBy === 'recent') filtered.sort((a, b) => (b[gameCount].h1/Math.max(b[gameCount].t,1)) - (a[gameCount].h1/Math.max(a[gameCount].t,1)));
+  else if (sortBy === 'metres') filtered.sort((a, b) => b[gameCount].avgMetres - a[gameCount].avgMetres);
+  else filtered.sort((a, b) => a.team.localeCompare(b.team) || a.name.localeCompare(b.name));
+
+  document.getElementById('playerCount').textContent = filtered.length + ' players';
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  let currentTeam = '';
+  filtered.forEach(p => {
+    const stats = p[gameCount];
+
+    if (sortBy === 'team' && p.team !== currentTeam) {
+      currentTeam = p.team;
+      const headerRow = document.createElement('tr');
+      headerRow.className = 'section-header';
+      headerRow.innerHTML = '<td colspan="7">' + p.team.toUpperCase() + '</td>';
+      tbody.appendChild(headerRow);
+    }
+
+    const c1 = getColor(stats.h1, stats.t);
+    const c2 = getColor(stats.h2, stats.t);
+    const cc = getCareerColor(p.careerRate);
+
+    const row = document.createElement('tr');
+    row.innerHTML =
+      '<td class="player-name">' + p.name + '</td>' +
+      '<td><span class="team-badge" style="background:' + p.teamColor + '">' + p.team + '</span></td>' +
+      '<td>' + stats.avgMetres + 'm</td>' +
+      '<td>' + stats.avgDef + '</td>' +
+      '<td><span class="matrix-cell" style="background:' + c1 + '">' + stats.h1 + '/' + stats.t + '</span></td>' +
+      '<td><span class="matrix-cell" style="background:' + c2 + '">' + stats.h2 + '/' + stats.t + '</span></td>' +
+      '<td><span class="career-cell" style="background:' + cc + '">' + p.careerRate + '</span></td>';
+    tbody.appendChild(row);
+  });
+}
+
+populateTeamFilter();
+renderTable();
+</script>
+</body>
+</html>
