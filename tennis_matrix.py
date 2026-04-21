@@ -7,7 +7,7 @@ import os
 import traceback
 from datetime import datetime, timedelta
 
-print("Building Enhanced Tennis Matrix with 2022-2026 Data...")
+print("Building Enhanced Tennis Matrix with Elo Ratings...")
 
 url_2022 = "https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_matches_2022.csv"
 url_2023 = "https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_matches_2023.csv"
@@ -35,7 +35,6 @@ def load_rankings():
     rankings_r = requests.get('https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_rankings_current.csv')
     rankings_df = pd.read_csv(io.StringIO(rankings_r.text))
     latest_date = rankings_df['ranking_date'].max()
-    print("Latest ranking date: " + str(latest_date))
     current = rankings_df[rankings_df['ranking_date'] == latest_date].head(100)
     merged = current.merge(
         players_df[['player_id', 'full_name', 'ioc', 'height', 'dob', 'hand']],
@@ -59,11 +58,98 @@ def get_tennis_odds():
                                 player = outcome['name']
                                 price = outcome['price']
                                 if player not in odds_dict or bm['key'] == 'draftkings':
-                                    odds_dict[player] = {'price': price, 'book': 'DraftKings' if bm['key'] == 'draftkings' else 'FanDuel'}
+                                    odds_dict[player] = {'price': price}
         return odds_dict
     except Exception as e:
         print("Odds error: " + str(e))
         return {}
+
+def calculate_elo(df):
+    print("Calculating Elo ratings...")
+    BASE_ELO = 1500
+    K_BASE = 32
+    K_GS = 40
+    K_MASTERS = 36
+
+    elo_overall = {}
+    elo_clay = {}
+    elo_hard = {}
+    elo_grass = {}
+    elo_history = {}
+
+    df_sorted = df.copy()
+    df_sorted['tourney_date'] = pd.to_numeric(df_sorted['tourney_date'], errors='coerce')
+    df_sorted = df_sorted.sort_values('tourney_date').reset_index(drop=True)
+
+    def get_e(d, p):
+        return d.get(p, BASE_ELO)
+
+    def exp_score(a, b):
+        return 1 / (1 + 10 ** ((b - a) / 400))
+
+    def update(d, w, l, k):
+        we = get_e(d, w)
+        le = get_e(d, l)
+        ew = exp_score(we, le)
+        d[w] = round(we + k * (1 - ew), 1)
+        d[l] = round(le + k * (0 - (1 - ew)), 1)
+
+    def track(player, surface, val):
+        key = player + '_' + surface
+        if key not in elo_history:
+            elo_history[key] = []
+        elo_history[key].append(val)
+        if len(elo_history[key]) > 10:
+            elo_history[key] = elo_history[key][-10:]
+
+    def trend(player, surface):
+        key = player + '_' + surface
+        h = elo_history.get(key, [])
+        if len(h) < 4:
+            return '—'
+        recent = sum(h[-3:]) / 3
+        older = sum(h[-6:-3]) / 3 if len(h) >= 6 else h[0]
+        diff = recent - older
+        if diff > 15: return '↑↑'
+        if diff > 5: return '↑'
+        if diff < -15: return '↓↓'
+        if diff < -5: return '↓'
+        return '—'
+
+    for _, row in df_sorted.iterrows():
+        w = str(row['winner_name'])
+        l = str(row['loser_name'])
+        s = str(row['surface'])
+        lv = str(row['tourney_level'])
+        k = K_GS if lv == 'G' else K_MASTERS if lv == 'M' else K_BASE
+
+        update(elo_overall, w, l, k)
+
+        if s == 'Clay':
+            update(elo_clay, w, l, k)
+            track(w, 'clay', get_e(elo_clay, w))
+            track(l, 'clay', get_e(elo_clay, l))
+        elif s == 'Hard':
+            update(elo_hard, w, l, k)
+            track(w, 'hard', get_e(elo_hard, w))
+            track(l, 'hard', get_e(elo_hard, l))
+        elif s == 'Grass':
+            update(elo_grass, w, l, k)
+            track(w, 'grass', get_e(elo_grass, w))
+            track(l, 'grass', get_e(elo_grass, l))
+
+    def get_player_elo(name):
+        return {
+            'overall': int(get_e(elo_overall, name)),
+            'clay': int(get_e(elo_clay, name)),
+            'hard': int(get_e(elo_hard, name)),
+            'grass': int(get_e(elo_grass, name)),
+            'clay_trend': trend(name, 'clay'),
+            'hard_trend': trend(name, 'hard'),
+            'grass_trend': trend(name, 'grass'),
+        }
+
+    return get_player_elo
 
 def get_player_stats(player_name, df, surface=None, months=None, tourney_level=None):
     won = df[df['winner_name'] == player_name].copy()
@@ -188,6 +274,8 @@ try:
     df = pd.concat([df_2022, df_2023, df_2024, df_2025, df_2026], ignore_index=True)
     print("Loaded " + str(len(df)) + " matches (2022-2026)")
 
+    get_player_elo = calculate_elo(df)
+
     print("Building H2H data...")
     matches_list = []
     for _, row in df.iterrows():
@@ -203,7 +291,6 @@ try:
             })
         except:
             continue
-    print("H2H data built: " + str(len(matches_list)) + " matches")
 
     rankings = load_rankings()
     print("Loaded " + str(len(rankings)) + " ranked players")
@@ -223,6 +310,7 @@ try:
 
         print("Processing #" + str(rank) + " " + player_name + "...")
 
+        elo = get_player_elo(player_name)
         clay_stats = get_player_stats(player_name, df, 'clay')
         hard_stats = get_player_stats(player_name, df, 'hard')
         grass_stats = get_player_stats(player_name, df, 'grass')
@@ -240,6 +328,7 @@ try:
         js_players.append({
             'name': player_name, 'country': country, 'rank': rank,
             'height': height, 'age': age, 'hand': hand, 'odds': odds_str,
+            'elo': elo,
             'clay': safe_stats(clay_stats), 'hard': safe_stats(hard_stats),
             'grass': safe_stats(grass_stats), 'all': safe_stats(all_stats),
             'form': safe_stats(form_stats), 'grandslam': safe_stats(grand_slam_stats),
@@ -274,6 +363,12 @@ td { padding: 8px 10px; text-align: center; border-bottom: 1px solid #151515; wh
 .player-name { text-align: left; font-weight: bold; font-size: 13px; }
 .country-badge { font-size: 10px; padding: 2px 5px; border-radius: 3px; background: #222; color: #aaa; }
 .stat-cell { font-weight: bold; font-size: 13px; border-radius: 3px; padding: 4px 8px; display: inline-block; min-width: 45px; }
+.elo-cell { font-weight: bold; font-size: 13px; color: #fff; }
+.trend-up2 { color: #00dd00; font-weight: bold; }
+.trend-up1 { color: #88cc88; }
+.trend-down2 { color: #ff4444; font-weight: bold; }
+.trend-down1 { color: #cc8888; }
+.trend-flat { color: #555; }
 .odds-cell { font-size: 12px; font-weight: bold; }
 tr:hover { background: #111; }
 .count-badge { background: #333; color: #888; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
@@ -327,6 +422,20 @@ function getColor(val, high, mid) {
   if (val >= mid) return '#7a6a00';
   return '#7a1a1a';
 }
+function getTrendClass(trend) {
+  if (trend === '↑↑') return 'trend-up2';
+  if (trend === '↑') return 'trend-up1';
+  if (trend === '↓↓') return 'trend-down2';
+  if (trend === '↓') return 'trend-down1';
+  return 'trend-flat';
+}
+function getEloColor(elo) {
+  if (elo >= 1900) return '#00dd00';
+  if (elo >= 1750) return '#88cc44';
+  if (elo >= 1650) return '#ccaa00';
+  if (elo >= 1550) return '#cc6600';
+  return '#888';
+}
 function populateCountries() {
   const countries = [...new Set(tennisData.map(p => p.country))].sort();
   const select = document.getElementById('countryFilter');
@@ -353,6 +462,10 @@ function renderTable() {
     'masters': 'Masters 1000 Performance | 2022-2026 Data'
   };
   document.getElementById('matrixSubtitle').textContent = subtitles[surface] || '';
+
+  // Determine which Elo surface to show
+  const eloSurf = (surface === 'clay' || surface === 'hard' || surface === 'grass') ? surface : 'overall';
+
   let filtered = tennisData.filter(p => {
     const s = p[surface];
     if (country !== 'all' && p.country !== country) return false;
@@ -361,10 +474,12 @@ function renderTable() {
     if (!s || s.matches < minMatches) return false;
     return true;
   });
+
   filtered.sort((a, b) => {
     const sa = a[surface]; const sb = b[surface];
     if (sortBy === 'win_rate') return sb.win_rate - sa.win_rate;
     if (sortBy === 'rank') return a.rank - b.rank;
+    if (sortBy === 'elo') return b.elo[eloSurf] - a.elo[eloSurf];
     if (sortBy === 'tpw') return sb.tpw_pct - sa.tpw_pct;
     if (sortBy === 'dominance') return sb.dominance_ratio - sa.dominance_ratio;
     if (sortBy === 'first_win') return sb.first_serve_win_pct - sa.first_serve_win_pct;
@@ -375,14 +490,19 @@ function renderTable() {
     if (sortBy === 'ace_df') return sb.ace_df_ratio - sa.ace_df_ratio;
     return 0;
   });
+
   document.getElementById('playerCount').textContent = filtered.length + ' players';
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
+
   filtered.forEach(p => {
     const s = p[surface];
     if (!s || s.matches === 0) return;
     const oddsColor = p.odds === 'N/A' ? '#555' : p.odds.startsWith('+') ? '#4CAF50' : '#4488ff';
     const safeName = p.name.replace(/'/g, "\\\\'");
+    const eloVal = p.elo[eloSurf];
+    const eloTrend = eloSurf === 'overall' ? '—' : p.elo[eloSurf + '_trend'];
+    const trendClass = getTrendClass(eloTrend);
     const row = document.createElement('tr');
     row.innerHTML =
       '<td class="player-name">' + p.name + '</td>' +
@@ -403,6 +523,8 @@ function renderTable() {
       '<td>' + s.avg_aces + '</td>' +
       '<td>' + s.avg_df + '</td>' +
       '<td>' + s.ace_df_ratio + '</td>' +
+      '<td class="elo-cell" style="color:' + getEloColor(eloVal) + '">' + eloVal + '</td>' +
+      '<td class="' + trendClass + '">' + eloTrend + '</td>' +
       '<td class="odds-cell" style="color:' + oddsColor + '">' + p.odds + '</td>' +
       '<td><button class="h2h-btn" onclick="openH2H(\\'' + safeName + '\\')">H2H</button></td>';
     tbody.appendChild(row);
@@ -537,6 +659,7 @@ renderTable();
         '<select id="sortBy" onchange="renderTable()">',
         '<option value="win_rate">Win Rate</option>',
         '<option value="rank">ATP Ranking</option>',
+        '<option value="elo">Elo Rating</option>',
         '<option value="tpw">TPW%</option>',
         '<option value="dominance">Dominance Ratio</option>',
         '<option value="first_win">1st Serve Win%</option>',
@@ -556,6 +679,10 @@ renderTable();
         '<div class="legend-item"><div class="legend-box" style="background:#1a7a1a"></div>Elite</div>',
         '<div class="legend-item"><div class="legend-box" style="background:#7a6a00"></div>Good</div>',
         '<div class="legend-item"><div class="legend-box" style="background:#7a1a1a"></div>Weak</div>',
+        '<div class="legend-item"><span class="trend-up2">↑↑</span> Strong rise</div>',
+        '<div class="legend-item"><span class="trend-up1">↑</span> Rising</div>',
+        '<div class="legend-item"><span class="trend-down1">↓</span> Falling</div>',
+        '<div class="legend-item"><span class="trend-down2">↓↓</span> Sharp fall</div>',
         '</div>',
         '<table><thead><tr>',
         '<th class="left">PLAYER</th><th>CTY</th><th>RNK</th><th>AGE</th><th>HT</th><th>HND</th>',
@@ -563,10 +690,11 @@ renderTable();
         '<th>1ST IN%</th><th>1ST WIN%</th><th>2ND WIN%</th>',
         '<th>BP SAV%</th><th>BP CNV%</th>',
         '<th>ACES</th><th>DF</th><th>A/DF</th>',
+        '<th>ELO</th><th>TREND</th>',
         '<th>ODDS</th><th>H2H</th>',
         '</tr></thead>',
         '<tbody id="tableBody"></tbody></table>',
-        '<div class="footer">The Gain Line | ATP Top 100 | Sackmann 2022-2024 + TennisMyLife 2025-2026 | Updated Daily</div>',
+        '<div class="footer">The Gain Line | ATP Top 100 | Sackmann 2022-2024 + TennisMyLife 2025-2026 | Elo Ratings Calculated | Updated Daily</div>',
         '</div>',
         '<div class="modal-overlay" id="h2hModal">',
         '<div class="modal">',
@@ -589,10 +717,10 @@ renderTable();
     html = ''.join(html_parts)
 
     filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tennis_matrix.html')
-    with open(filepath, 'w') as f:
+    with open(filepath, 'w', encoding='utf-8') as f:
         f.write(html)
 
-    print("\nTennis Matrix with 2022-2026 data generated! Opening in browser...")
+    print("\nTennis Matrix with Elo ratings generated! Opening in browser...")
     webbrowser.open('file:///' + filepath)
 
 except Exception as e:
