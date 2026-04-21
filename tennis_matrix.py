@@ -7,15 +7,24 @@ import os
 import traceback
 from datetime import datetime, timedelta
 
-print("Building Enhanced Tennis Matrix with H2H...")
+print("Building Enhanced Tennis Matrix with 2022-2026 Data...")
 
-url_2024 = "https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_matches_2024.csv"
-url_2023 = "https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_matches_2023.csv"
 url_2022 = "https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_matches_2022.csv"
+url_2023 = "https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_matches_2023.csv"
+url_2024 = "https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_matches_2024.csv"
+url_2025 = "https://stats.tennismylife.org/data/2025.csv"
+url_2026 = "https://stats.tennismylife.org/data/2026.csv"
 
 def load_match_data(url):
     r = requests.get(url)
-    return pd.read_csv(io.StringIO(r.text))
+    df = pd.read_csv(io.StringIO(r.text), low_memory=False)
+    numeric_cols = ['w_ace', 'w_df', 'w_svpt', 'w_1stIn', 'w_1stWon', 'w_2ndWon',
+                    'w_bpSaved', 'w_bpFaced', 'l_ace', 'l_df', 'l_svpt', 'l_1stIn',
+                    'l_1stWon', 'l_2ndWon', 'l_bpSaved', 'l_bpFaced']
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+    return df
 
 def load_rankings():
     print("Loading player names...")
@@ -26,6 +35,7 @@ def load_rankings():
     rankings_r = requests.get('https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_rankings_current.csv')
     rankings_df = pd.read_csv(io.StringIO(rankings_r.text))
     latest_date = rankings_df['ranking_date'].max()
+    print("Latest ranking date: " + str(latest_date))
     current = rankings_df[rankings_df['ranking_date'] == latest_date].head(100)
     merged = current.merge(
         players_df[['player_id', 'full_name', 'ioc', 'height', 'dob', 'hand']],
@@ -110,34 +120,36 @@ def get_player_stats(player_name, df, surface=None, months=None, tourney_level=N
     matches = len(all_matches)
     wins = int(all_matches['result'].sum())
     win_rate = round(wins / matches * 100, 1)
-    avg_aces = round(float(all_matches['aces'].mean()), 1)
-    avg_df = round(float(all_matches['df_col'].mean()), 1)
+    avg_aces = round(float(pd.to_numeric(all_matches['aces'], errors='coerce').mean()), 1)
+    avg_df = round(float(pd.to_numeric(all_matches['df_col'], errors='coerce').mean()), 1)
     ace_df_ratio = round(avg_aces / avg_df, 2) if avg_df > 0 else 0
 
-    total_svpt = all_matches['svpt'].sum()
-    total_firstIn = all_matches['firstIn'].sum()
-    total_firstWon = all_matches['firstWon'].sum()
-    total_secondWon = all_matches['secondWon'].sum()
+    total_svpt = pd.to_numeric(all_matches['svpt'], errors='coerce').sum()
+    total_firstIn = pd.to_numeric(all_matches['firstIn'], errors='coerce').sum()
+    total_firstWon = pd.to_numeric(all_matches['firstWon'], errors='coerce').sum()
+    total_secondWon = pd.to_numeric(all_matches['secondWon'], errors='coerce').sum()
     total_second_attempts = total_svpt - total_firstIn
 
     first_serve_in_pct = round(float(total_firstIn / total_svpt * 100), 1) if total_svpt > 0 else 0
     first_serve_win_pct = round(float(total_firstWon / total_firstIn * 100), 1) if total_firstIn > 0 else 0
     second_serve_win_pct = round(float(total_secondWon / total_second_attempts * 100), 1) if total_second_attempts > 0 else 0
 
-    total_bpFaced = all_matches['bpFaced'].sum()
-    total_bpSaved = all_matches['bpSaved'].sum()
+    total_bpFaced = pd.to_numeric(all_matches['bpFaced'], errors='coerce').sum()
+    total_bpSaved = pd.to_numeric(all_matches['bpSaved'], errors='coerce').sum()
     bp_save_pct = round(float(total_bpSaved / total_bpFaced * 100), 1) if total_bpFaced > 0 else 0
 
-    opp_bpFaced = all_matches['opp_bpFaced'].sum()
-    opp_bpSaved = all_matches['opp_bpSaved'].sum()
+    opp_bpFaced = pd.to_numeric(all_matches['opp_bpFaced'], errors='coerce').sum()
+    opp_bpSaved = pd.to_numeric(all_matches['opp_bpSaved'], errors='coerce').sum()
     bp_convert_pct = round(float((opp_bpFaced - opp_bpSaved) / opp_bpFaced * 100), 1) if opp_bpFaced > 0 else 0
 
     player_points = total_firstWon + total_secondWon
-    opp_points = all_matches['opp_firstWon'].sum() + all_matches['opp_secondWon'].sum()
+    opp_firstWon = pd.to_numeric(all_matches['opp_firstWon'], errors='coerce').sum()
+    opp_secondWon = pd.to_numeric(all_matches['opp_secondWon'], errors='coerce').sum()
+    opp_points = opp_firstWon + opp_secondWon
     total_points = player_points + opp_points
     tpw_pct = round(float(player_points / total_points * 100), 1) if total_points > 0 else 0
 
-    opp_svpt = all_matches['opp_svpt'].sum()
+    opp_svpt = pd.to_numeric(all_matches['opp_svpt'], errors='coerce').sum()
     serve_pts_won_pct = player_points / total_svpt if total_svpt > 0 else 0
     opp_serve_pts_won_pct = opp_points / opp_svpt if opp_svpt > 0 else 0
     dominance_ratio = round(float(serve_pts_won_pct / opp_serve_pts_won_pct), 2) if opp_serve_pts_won_pct > 0 else 0
@@ -171,8 +183,10 @@ try:
     df_2022 = load_match_data(url_2022)
     df_2023 = load_match_data(url_2023)
     df_2024 = load_match_data(url_2024)
-    df = pd.concat([df_2022, df_2023, df_2024], ignore_index=True)
-    print("Loaded " + str(len(df)) + " matches")
+    df_2025 = load_match_data(url_2025)
+    df_2026 = load_match_data(url_2026)
+    df = pd.concat([df_2022, df_2023, df_2024, df_2025, df_2026], ignore_index=True)
+    print("Loaded " + str(len(df)) + " matches (2022-2026)")
 
     print("Building H2H data...")
     matches_list = []
@@ -313,7 +327,6 @@ function getColor(val, high, mid) {
   if (val >= mid) return '#7a6a00';
   return '#7a1a1a';
 }
-
 function populateCountries() {
   const countries = [...new Set(tennisData.map(p => p.country))].sort();
   const select = document.getElementById('countryFilter');
@@ -323,7 +336,6 @@ function populateCountries() {
     select.appendChild(opt);
   });
 }
-
 function renderTable() {
   const surface = document.getElementById('surfaceFilter').value;
   const country = document.getElementById('countryFilter').value;
@@ -332,13 +344,13 @@ function renderTable() {
   const sortBy = document.getElementById('sortBy').value;
   const search = document.getElementById('searchBox').value.toLowerCase();
   const subtitles = {
-    'clay': 'Clay Court Stats | 2022-2024 Data | Madrid Open Preview',
-    'hard': 'Hard Court Stats | 2022-2024 Data',
-    'grass': 'Grass Court Stats | 2022-2024 Data | Wimbledon Preview',
-    'all': 'All Surface Stats | 2022-2024 Data',
-    'form': 'Last 6 Months Form | 2024 Data',
-    'grandslam': 'Grand Slam Performance | 2022-2024 Data',
-    'masters': 'Masters 1000 Performance | 2022-2024 Data'
+    'clay': 'Clay Court Stats | 2022-2026 Data | Madrid Open Preview',
+    'hard': 'Hard Court Stats | 2022-2026 Data',
+    'grass': 'Grass Court Stats | 2022-2026 Data | Wimbledon Preview',
+    'all': 'All Surface Stats | 2022-2026 Data',
+    'form': 'Last 6 Months Form | Current 2026 Data',
+    'grandslam': 'Grand Slam Performance | 2022-2026 Data',
+    'masters': 'Masters 1000 Performance | 2022-2026 Data'
   };
   document.getElementById('matrixSubtitle').textContent = subtitles[surface] || '';
   let filtered = tennisData.filter(p => {
@@ -396,10 +408,8 @@ function renderTable() {
     tbody.appendChild(row);
   });
 }
-
 var currentPlayer = '';
 var selectedOpp = '';
-
 function openH2H(playerName) {
   currentPlayer = playerName;
   selectedOpp = '';
@@ -409,11 +419,9 @@ function openH2H(playerName) {
   document.getElementById('h2hResults').innerHTML = '';
   document.getElementById('h2hModal').classList.add('active');
 }
-
 function closeH2H() {
   document.getElementById('h2hModal').classList.remove('active');
 }
-
 function showOppSugg(val) {
   var box = document.getElementById('oppSugg');
   if (val.length < 2) { box.innerHTML = ''; return; }
@@ -425,26 +433,22 @@ function showOppSugg(val) {
     '<div class="sugg-item" onclick="pickOpp(this.textContent)">' + n + '</div>'
   ).join('');
 }
-
 function pickOpp(name) {
   selectedOpp = name;
   document.getElementById('oppInput').value = name;
   document.getElementById('oppSugg').innerHTML = '';
 }
-
 function getSurfPill(s) {
   if (s==='Clay') return '<span class="pill clay-pill">Clay</span>';
   if (s==='Hard') return '<span class="pill hard-pill">Hard</span>';
   if (s==='Grass') return '<span class="pill grass-pill">Grass</span>';
   return '<span class="pill">' + s + '</span>';
 }
-
 function getLvlPill(l) {
   if (l==='G') return '<span class="pill gs-pill">GS</span>';
   if (l==='M') return '<span class="pill m-pill">M</span>';
   return '';
 }
-
 function runH2H() {
   var p1 = currentPlayer;
   var p2 = selectedOpp || document.getElementById('oppInput').value.trim();
@@ -482,26 +486,25 @@ function runH2H() {
     '<div class="meetings-hdr">All Meetings ('+h2h.length+')</div>'+
     mHTML;
 }
-
 document.getElementById('h2hModal').addEventListener('click', function(e) {
   if (e.target === this) closeH2H();
 });
-
 populateCountries();
 renderTable();
 """
 
     html_parts = [
         '<!DOCTYPE html><html><head>',
-        '<title>The Gain Line - Tennis</title>',
+        '<title>The Gain Line - ATP Tennis</title>',
         '<style>', css, '</style>',
         '</head><body>',
         '<div class="header">',
         '<div class="logo">THE <span>GAIN</span> LINE</div>',
         '<div class="nav-tabs">',
-        '<div class="nav-tab">Super Rugby Pacific</div>',
-        '<div class="nav-tab">EPL Soccer</div>',
-        '<div class="nav-tab active">Tennis</div>',
+        '<div class="nav-tab" onclick="location.href=\'prop_matrix.html\'">Super Rugby Pacific</div>',
+        '<div class="nav-tab" onclick="location.href=\'epl_matrix.html\'">EPL Soccer</div>',
+        '<div class="nav-tab active">ATP Tennis</div>',
+        '<div class="nav-tab" onclick="location.href=\'wta_matrix.html\'">WTA Tennis</div>',
         '</div></div>',
         '<div class="controls">',
         '<div class="control-group"><span class="control-label">Surface / Context</span>',
@@ -548,7 +551,7 @@ renderTable();
         '</div>',
         '<div class="container">',
         '<div class="matrix-title">ATP Tennis Matrix <span class="count-badge" id="playerCount"></span></div>',
-        '<div class="matrix-subtitle" id="matrixSubtitle">Clay Court Stats | 2022-2024 Data</div>',
+        '<div class="matrix-subtitle" id="matrixSubtitle">Clay Court Stats | 2022-2026 Data | Updated Daily</div>',
         '<div class="legend">',
         '<div class="legend-item"><div class="legend-box" style="background:#1a7a1a"></div>Elite</div>',
         '<div class="legend-item"><div class="legend-box" style="background:#7a6a00"></div>Good</div>',
@@ -563,7 +566,7 @@ renderTable();
         '<th>ODDS</th><th>H2H</th>',
         '</tr></thead>',
         '<tbody id="tableBody"></tbody></table>',
-        '<div class="footer">The Gain Line | ATP Top 100 | Jeff Sackmann Dataset | 2022-2024 Data</div>',
+        '<div class="footer">The Gain Line | ATP Top 100 | Sackmann 2022-2024 + TennisMyLife 2025-2026 | Updated Daily</div>',
         '</div>',
         '<div class="modal-overlay" id="h2hModal">',
         '<div class="modal">',
@@ -589,7 +592,7 @@ renderTable();
     with open(filepath, 'w') as f:
         f.write(html)
 
-    print("\nTennis Matrix with H2H generated! Opening in browser...")
+    print("\nTennis Matrix with 2022-2026 data generated! Opening in browser...")
     webbrowser.open('file:///' + filepath)
 
 except Exception as e:
