@@ -1,47 +1,21 @@
-import pandas as pd
-import requests
-import io
 import json
+import requests
 import webbrowser
 import os
-import traceback
-from datetime import datetime, timedelta
 
-print("Building Enhanced Tennis Matrix with Elo Ratings...")
+print("Building ATP Tennis Matrix from cached data...")
 
-url_2022 = "https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_matches_2022.csv"
-url_2023 = "https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_matches_2023.csv"
-url_2024 = "https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_matches_2024.csv"
-url_2025 = "https://stats.tennismylife.org/data/2025.csv"
-url_2026 = "https://stats.tennismylife.org/data/2026.csv"
+# Load pre-built data
+with open('atp_data.json', 'r', encoding='utf-8') as f:
+    data = json.load(f)
 
-def load_match_data(url):
-    r = requests.get(url)
-    df = pd.read_csv(io.StringIO(r.text), low_memory=False)
-    numeric_cols = ['w_ace', 'w_df', 'w_svpt', 'w_1stIn', 'w_1stWon', 'w_2ndWon',
-                    'w_bpSaved', 'w_bpFaced', 'l_ace', 'l_df', 'l_svpt', 'l_1stIn',
-                    'l_1stWon', 'l_2ndWon', 'l_bpSaved', 'l_bpFaced']
-    for col in numeric_cols:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors='coerce')
-    return df
+players = data['players']
+matches_list = data['matches']
+generated = data['generated']
+print("Loaded " + str(len(players)) + " players, " + str(len(matches_list)) + " matches")
+print("Data generated: " + generated)
 
-def load_rankings():
-    print("Loading player names...")
-    players_r = requests.get('https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_players.csv')
-    players_df = pd.read_csv(io.StringIO(players_r.text), low_memory=False)
-    players_df['full_name'] = players_df['name_first'] + ' ' + players_df['name_last']
-    print("Loading rankings...")
-    rankings_r = requests.get('https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_rankings_current.csv')
-    rankings_df = pd.read_csv(io.StringIO(rankings_r.text))
-    latest_date = rankings_df['ranking_date'].max()
-    current = rankings_df[rankings_df['ranking_date'] == latest_date].head(100)
-    merged = current.merge(
-        players_df[['player_id', 'full_name', 'ioc', 'height', 'dob', 'hand']],
-        left_on='player', right_on='player_id'
-    )
-    return merged[['rank', 'full_name', 'ioc', 'points', 'height', 'dob', 'hand']].sort_values('rank')
-
+# Fetch live odds
 def get_tennis_odds():
     try:
         url = 'https://api.the-odds-api.com/v4/sports/tennis_atp_madrid_open/odds/'
@@ -58,287 +32,28 @@ def get_tennis_odds():
                                 player = outcome['name']
                                 price = outcome['price']
                                 if player not in odds_dict or bm['key'] == 'draftkings':
-                                    odds_dict[player] = {'price': price}
+                                    odds_dict[player] = price
         return odds_dict
     except Exception as e:
         print("Odds error: " + str(e))
         return {}
 
-def calculate_elo(df):
-    print("Calculating Elo ratings...")
-    BASE_ELO = 1500
-    K_BASE = 32
-    K_GS = 40
-    K_MASTERS = 36
+print("Fetching live odds...")
+odds = get_tennis_odds()
+print("Odds found for " + str(len(odds)) + " players")
 
-    elo_overall = {}
-    elo_clay = {}
-    elo_hard = {}
-    elo_grass = {}
-    elo_history = {}
+# Inject odds into player data
+for p in players:
+    price = odds.get(p['name'], None)
+    if price:
+        p['odds'] = ('+' + str(price)) if price > 0 else str(price)
+    else:
+        p['odds'] = 'N/A'
 
-    df_sorted = df.copy()
-    df_sorted['tourney_date'] = pd.to_numeric(df_sorted['tourney_date'], errors='coerce')
-    df_sorted = df_sorted.sort_values('tourney_date').reset_index(drop=True)
+js_data = 'const tennisData = ' + json.dumps(players) + ';\n'
+js_data += 'const matchData = ' + json.dumps(matches_list) + ';\n'
 
-    def get_e(d, p):
-        return d.get(p, BASE_ELO)
-
-    def exp_score(a, b):
-        return 1 / (1 + 10 ** ((b - a) / 400))
-
-    def update(d, w, l, k):
-        we = get_e(d, w)
-        le = get_e(d, l)
-        ew = exp_score(we, le)
-        d[w] = round(we + k * (1 - ew), 1)
-        d[l] = round(le + k * (0 - (1 - ew)), 1)
-
-    def track(player, surface, val):
-        key = player + '_' + surface
-        if key not in elo_history:
-            elo_history[key] = []
-        elo_history[key].append(val)
-        if len(elo_history[key]) > 10:
-            elo_history[key] = elo_history[key][-10:]
-
-    def trend(player, surface):
-        key = player + '_' + surface
-        h = elo_history.get(key, [])
-        if len(h) < 4:
-            return '—'
-        recent = sum(h[-3:]) / 3
-        older = sum(h[-6:-3]) / 3 if len(h) >= 6 else h[0]
-        diff = recent - older
-        if diff > 15: return '↑↑'
-        if diff > 5: return '↑'
-        if diff < -15: return '↓↓'
-        if diff < -5: return '↓'
-        return '—'
-
-    for _, row in df_sorted.iterrows():
-        w = str(row['winner_name'])
-        l = str(row['loser_name'])
-        s = str(row['surface'])
-        lv = str(row['tourney_level'])
-        k = K_GS if lv == 'G' else K_MASTERS if lv == 'M' else K_BASE
-
-        update(elo_overall, w, l, k)
-
-        if s == 'Clay':
-            update(elo_clay, w, l, k)
-            track(w, 'clay', get_e(elo_clay, w))
-            track(l, 'clay', get_e(elo_clay, l))
-        elif s == 'Hard':
-            update(elo_hard, w, l, k)
-            track(w, 'hard', get_e(elo_hard, w))
-            track(l, 'hard', get_e(elo_hard, l))
-        elif s == 'Grass':
-            update(elo_grass, w, l, k)
-            track(w, 'grass', get_e(elo_grass, w))
-            track(l, 'grass', get_e(elo_grass, l))
-
-    def get_player_elo(name):
-        return {
-            'overall': int(get_e(elo_overall, name)),
-            'clay': int(get_e(elo_clay, name)),
-            'hard': int(get_e(elo_hard, name)),
-            'grass': int(get_e(elo_grass, name)),
-            'clay_trend': trend(name, 'clay'),
-            'hard_trend': trend(name, 'hard'),
-            'grass_trend': trend(name, 'grass'),
-        }
-
-    return get_player_elo
-
-def get_player_stats(player_name, df, surface=None, months=None, tourney_level=None):
-    won = df[df['winner_name'] == player_name].copy()
-    won['aces'] = won['w_ace']
-    won['df_col'] = won['w_df']
-    won['svpt'] = won['w_svpt']
-    won['firstIn'] = won['w_1stIn']
-    won['firstWon'] = won['w_1stWon']
-    won['secondWon'] = won['w_2ndWon']
-    won['bpSaved'] = won['w_bpSaved']
-    won['bpFaced'] = won['w_bpFaced']
-    won['opp_svpt'] = won['l_svpt']
-    won['opp_firstWon'] = won['l_1stWon']
-    won['opp_secondWon'] = won['l_2ndWon']
-    won['opp_bpSaved'] = won['l_bpSaved']
-    won['opp_bpFaced'] = won['l_bpFaced']
-    won['result'] = 1
-
-    lost = df[df['loser_name'] == player_name].copy()
-    lost['aces'] = lost['l_ace']
-    lost['df_col'] = lost['l_df']
-    lost['svpt'] = lost['l_svpt']
-    lost['firstIn'] = lost['l_1stIn']
-    lost['firstWon'] = lost['l_1stWon']
-    lost['secondWon'] = lost['l_2ndWon']
-    lost['bpSaved'] = lost['l_bpSaved']
-    lost['bpFaced'] = lost['l_bpFaced']
-    lost['opp_svpt'] = lost['w_svpt']
-    lost['opp_firstWon'] = lost['w_1stWon']
-    lost['opp_secondWon'] = lost['w_2ndWon']
-    lost['opp_bpSaved'] = lost['w_bpSaved']
-    lost['opp_bpFaced'] = lost['w_bpFaced']
-    lost['result'] = 0
-
-    cols = ['surface', 'tourney_level', 'tourney_date', 'result',
-            'aces', 'df_col', 'svpt', 'firstIn', 'firstWon', 'secondWon',
-            'bpSaved', 'bpFaced', 'opp_svpt', 'opp_firstWon', 'opp_secondWon',
-            'opp_bpSaved', 'opp_bpFaced']
-
-    all_matches = pd.concat([won[cols], lost[cols]], ignore_index=True)
-
-    if surface and surface != 'all':
-        all_matches = all_matches[all_matches['surface'] == surface.capitalize()]
-    if tourney_level and tourney_level != 'all':
-        all_matches = all_matches[all_matches['tourney_level'] == tourney_level]
-    if months:
-        cutoff = int((datetime.now() - timedelta(days=months*30)).strftime('%Y%m%d'))
-        all_matches['tourney_date'] = pd.to_numeric(all_matches['tourney_date'], errors='coerce')
-        all_matches = all_matches[all_matches['tourney_date'] >= cutoff]
-
-    if len(all_matches) == 0:
-        return None
-
-    matches = len(all_matches)
-    wins = int(all_matches['result'].sum())
-    win_rate = round(wins / matches * 100, 1)
-    avg_aces = round(float(pd.to_numeric(all_matches['aces'], errors='coerce').mean()), 1)
-    avg_df = round(float(pd.to_numeric(all_matches['df_col'], errors='coerce').mean()), 1)
-    ace_df_ratio = round(avg_aces / avg_df, 2) if avg_df > 0 else 0
-
-    total_svpt = pd.to_numeric(all_matches['svpt'], errors='coerce').sum()
-    total_firstIn = pd.to_numeric(all_matches['firstIn'], errors='coerce').sum()
-    total_firstWon = pd.to_numeric(all_matches['firstWon'], errors='coerce').sum()
-    total_secondWon = pd.to_numeric(all_matches['secondWon'], errors='coerce').sum()
-    total_second_attempts = total_svpt - total_firstIn
-
-    first_serve_in_pct = round(float(total_firstIn / total_svpt * 100), 1) if total_svpt > 0 else 0
-    first_serve_win_pct = round(float(total_firstWon / total_firstIn * 100), 1) if total_firstIn > 0 else 0
-    second_serve_win_pct = round(float(total_secondWon / total_second_attempts * 100), 1) if total_second_attempts > 0 else 0
-
-    total_bpFaced = pd.to_numeric(all_matches['bpFaced'], errors='coerce').sum()
-    total_bpSaved = pd.to_numeric(all_matches['bpSaved'], errors='coerce').sum()
-    bp_save_pct = round(float(total_bpSaved / total_bpFaced * 100), 1) if total_bpFaced > 0 else 0
-
-    opp_bpFaced = pd.to_numeric(all_matches['opp_bpFaced'], errors='coerce').sum()
-    opp_bpSaved = pd.to_numeric(all_matches['opp_bpSaved'], errors='coerce').sum()
-    bp_convert_pct = round(float((opp_bpFaced - opp_bpSaved) / opp_bpFaced * 100), 1) if opp_bpFaced > 0 else 0
-
-    player_points = total_firstWon + total_secondWon
-    opp_firstWon = pd.to_numeric(all_matches['opp_firstWon'], errors='coerce').sum()
-    opp_secondWon = pd.to_numeric(all_matches['opp_secondWon'], errors='coerce').sum()
-    opp_points = opp_firstWon + opp_secondWon
-    total_points = player_points + opp_points
-    tpw_pct = round(float(player_points / total_points * 100), 1) if total_points > 0 else 0
-
-    opp_svpt = pd.to_numeric(all_matches['opp_svpt'], errors='coerce').sum()
-    serve_pts_won_pct = player_points / total_svpt if total_svpt > 0 else 0
-    opp_serve_pts_won_pct = opp_points / opp_svpt if opp_svpt > 0 else 0
-    dominance_ratio = round(float(serve_pts_won_pct / opp_serve_pts_won_pct), 2) if opp_serve_pts_won_pct > 0 else 0
-
-    return {
-        'matches': matches, 'wins': wins, 'win_rate': win_rate,
-        'avg_aces': avg_aces, 'avg_df': avg_df, 'ace_df_ratio': ace_df_ratio,
-        'first_serve_in_pct': first_serve_in_pct, 'first_serve_win_pct': first_serve_win_pct,
-        'second_serve_win_pct': second_serve_win_pct, 'bp_save_pct': bp_save_pct,
-        'bp_convert_pct': bp_convert_pct, 'tpw_pct': tpw_pct, 'dominance_ratio': dominance_ratio,
-    }
-
-def safe_stats(s):
-    if s is None:
-        return {'matches': 0, 'wins': 0, 'win_rate': 0, 'avg_aces': 0, 'avg_df': 0,
-                'ace_df_ratio': 0, 'first_serve_in_pct': 0, 'first_serve_win_pct': 0,
-                'second_serve_win_pct': 0, 'bp_save_pct': 0, 'bp_convert_pct': 0,
-                'tpw_pct': 0, 'dominance_ratio': 0}
-    return s
-
-def calc_age(dob):
-    try:
-        dob_str = str(int(dob))
-        birth = datetime.strptime(dob_str, '%Y%m%d')
-        return (datetime.now() - birth).days // 365
-    except:
-        return 'N/A'
-
-try:
-    print("Loading match data...")
-    df_2022 = load_match_data(url_2022)
-    df_2023 = load_match_data(url_2023)
-    df_2024 = load_match_data(url_2024)
-    df_2025 = load_match_data(url_2025)
-    df_2026 = load_match_data(url_2026)
-    df = pd.concat([df_2022, df_2023, df_2024, df_2025, df_2026], ignore_index=True)
-    print("Loaded " + str(len(df)) + " matches (2022-2026)")
-
-    get_player_elo = calculate_elo(df)
-
-    print("Building H2H data...")
-    matches_list = []
-    for _, row in df.iterrows():
-        try:
-            matches_list.append({
-                'w': str(row['winner_name']),
-                'l': str(row['loser_name']),
-                's': str(row['surface']),
-                't': str(row['tourney_name']),
-                'd': str(row['tourney_date']),
-                'sc': str(row['score']),
-                'lv': str(row['tourney_level'])
-            })
-        except:
-            continue
-
-    rankings = load_rankings()
-    print("Loaded " + str(len(rankings)) + " ranked players")
-
-    print("Fetching odds...")
-    odds = get_tennis_odds()
-    print("Odds found for " + str(len(odds)) + " players")
-
-    js_players = []
-    for _, row in rankings.iterrows():
-        player_name = str(row['full_name'])
-        rank = int(row['rank'])
-        country = str(row['ioc'])
-        height = str(int(row['height'])) + 'cm' if not pd.isna(row['height']) else 'N/A'
-        age = calc_age(row['dob'])
-        hand = str(row['hand']) if not pd.isna(row['hand']) else 'N/A'
-
-        print("Processing #" + str(rank) + " " + player_name + "...")
-
-        elo = get_player_elo(player_name)
-        clay_stats = get_player_stats(player_name, df, 'clay')
-        hard_stats = get_player_stats(player_name, df, 'hard')
-        grass_stats = get_player_stats(player_name, df, 'grass')
-        all_stats = get_player_stats(player_name, df, 'all')
-        form_stats = get_player_stats(player_name, df, 'all', months=6)
-        grand_slam_stats = get_player_stats(player_name, df, 'all', tourney_level='G')
-        masters_stats = get_player_stats(player_name, df, 'all', tourney_level='M')
-
-        player_odds = odds.get(player_name, None)
-        odds_str = 'N/A'
-        if player_odds:
-            price = player_odds['price']
-            odds_str = ('+' + str(price)) if price > 0 else str(price)
-
-        js_players.append({
-            'name': player_name, 'country': country, 'rank': rank,
-            'height': height, 'age': age, 'hand': hand, 'odds': odds_str,
-            'elo': elo,
-            'clay': safe_stats(clay_stats), 'hard': safe_stats(hard_stats),
-            'grass': safe_stats(grass_stats), 'all': safe_stats(all_stats),
-            'form': safe_stats(form_stats), 'grandslam': safe_stats(grand_slam_stats),
-            'masters': safe_stats(masters_stats),
-        })
-
-    js_data = 'const tennisData = ' + json.dumps(js_players) + ';\n'
-    js_data += 'const matchData = ' + json.dumps(matches_list) + ';\n'
-
-    css = """
+css = """
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: Arial, sans-serif; background: #0a0a0a; color: #ffffff; overflow-x: auto; }
 .header { background: #111; border-bottom: 2px solid #222; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
@@ -363,12 +78,6 @@ td { padding: 8px 10px; text-align: center; border-bottom: 1px solid #151515; wh
 .player-name { text-align: left; font-weight: bold; font-size: 13px; }
 .country-badge { font-size: 10px; padding: 2px 5px; border-radius: 3px; background: #222; color: #aaa; }
 .stat-cell { font-weight: bold; font-size: 13px; border-radius: 3px; padding: 4px 8px; display: inline-block; min-width: 45px; }
-.elo-cell { font-weight: bold; font-size: 13px; color: #fff; }
-.trend-up2 { color: #00dd00; font-weight: bold; }
-.trend-up1 { color: #88cc88; }
-.trend-down2 { color: #ff4444; font-weight: bold; }
-.trend-down1 { color: #cc8888; }
-.trend-flat { color: #555; }
 .odds-cell { font-size: 12px; font-weight: bold; }
 tr:hover { background: #111; }
 .count-badge { background: #333; color: #888; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
@@ -376,6 +85,11 @@ tr:hover { background: #111; }
 .legend { display: flex; gap: 20px; justify-content: center; margin: 15px 0; font-size: 12px; color: #888; flex-wrap: wrap; }
 .legend-item { display: flex; align-items: center; gap: 6px; }
 .legend-box { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+.trend-up2 { color: #00dd00; font-weight: bold; }
+.trend-up1 { color: #88cc88; }
+.trend-down2 { color: #ff4444; font-weight: bold; }
+.trend-down1 { color: #cc8888; }
+.trend-flat { color: #555; }
 .h2h-btn { background: #1a3a1a; color: #4CAF50; border: 1px solid #4CAF50; border-radius: 4px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-weight: bold; }
 .h2h-btn:hover { background: #4CAF50; color: #fff; }
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: flex-start; padding-top: 50px; }
@@ -416,7 +130,7 @@ tr:hover { background: #111; }
 .sugg-item:hover { background: #252525; color: #4CAF50; }
 """
 
-    js_code = """
+js_code = """
 function getColor(val, high, mid) {
   if (val >= high) return '#1a7a1a';
   if (val >= mid) return '#7a6a00';
@@ -436,14 +150,36 @@ function getEloColor(elo) {
   if (elo >= 1550) return '#cc6600';
   return '#888';
 }
-function populateCountries() {
+function populateFilters() {
   const countries = [...new Set(tennisData.map(p => p.country))].sort();
-  const select = document.getElementById('countryFilter');
+  const sel = document.getElementById('countryFilter');
   countries.forEach(c => {
     const opt = document.createElement('option');
     opt.value = c; opt.textContent = c;
-    select.appendChild(opt);
+    sel.appendChild(opt);
   });
+}
+function getSurfaceKey(surface) {
+  if (surface === 'clay') return 'clay';
+  if (surface === 'hard') return 'hard';
+  if (surface === 'grass') return 'grass';
+  if (surface === 'all') return 'all';
+  if (surface === 'form_6m') return 'form_6m';
+  if (surface === 'last5') return 'last5';
+  if (surface === 'last10') return 'last10';
+  if (surface === 'last15') return 'last15';
+  if (surface === 'grandslam') return 'grandslam';
+  if (surface === 'masters') return 'masters';
+  if (surface === 'clay_last10') return 'clay_last10';
+  if (surface === 'hard_last10') return 'hard_last10';
+  if (surface === 'grass_last10') return 'grass_last10';
+  return 'all';
+}
+function getEloSurface(surface) {
+  if (surface === 'clay' || surface === 'clay_last10') return 'clay';
+  if (surface === 'hard' || surface === 'hard_last10') return 'hard';
+  if (surface === 'grass' || surface === 'grass_last10') return 'grass';
+  return 'overall';
 }
 function renderTable() {
   const surface = document.getElementById('surfaceFilter').value;
@@ -452,22 +188,28 @@ function renderTable() {
   const minMatches = parseInt(document.getElementById('minMatches').value);
   const sortBy = document.getElementById('sortBy').value;
   const search = document.getElementById('searchBox').value.toLowerCase();
+  const sKey = getSurfaceKey(surface);
+  const eloSurf = getEloSurface(surface);
+
   const subtitles = {
-    'clay': 'Clay Court Stats | 2022-2026 Data | Madrid Open Preview',
-    'hard': 'Hard Court Stats | 2022-2026 Data',
-    'grass': 'Grass Court Stats | 2022-2026 Data | Wimbledon Preview',
-    'all': 'All Surface Stats | 2022-2026 Data',
-    'form': 'Last 6 Months Form | Current 2026 Data',
-    'grandslam': 'Grand Slam Performance | 2022-2026 Data',
-    'masters': 'Masters 1000 Performance | 2022-2026 Data'
+    'clay': 'Clay Court Stats | 2022-2026 | Madrid Open Preview',
+    'hard': 'Hard Court Stats | 2022-2026',
+    'grass': 'Grass Court Stats | 2022-2026 | Wimbledon Preview',
+    'all': 'All Surface Stats | 2022-2026',
+    'form_6m': 'Last 6 Months Form | Current 2026',
+    'last5': 'Last 5 Matches Form',
+    'last10': 'Last 10 Matches Form',
+    'last15': 'Last 15 Matches Form',
+    'grandslam': 'Grand Slam Performance | 2022-2026',
+    'masters': 'Masters 1000 Performance | 2022-2026',
+    'clay_last10': 'Clay — Last 10 Matches',
+    'hard_last10': 'Hard — Last 10 Matches',
+    'grass_last10': 'Grass — Last 10 Matches',
   };
   document.getElementById('matrixSubtitle').textContent = subtitles[surface] || '';
 
-  // Determine which Elo surface to show
-  const eloSurf = (surface === 'clay' || surface === 'hard' || surface === 'grass') ? surface : 'overall';
-
   let filtered = tennisData.filter(p => {
-    const s = p[surface];
+    const s = p[sKey];
     if (country !== 'all' && p.country !== country) return false;
     if (hand !== 'all' && p.hand !== hand) return false;
     if (search && !p.name.toLowerCase().includes(search)) return false;
@@ -476,7 +218,7 @@ function renderTable() {
   });
 
   filtered.sort((a, b) => {
-    const sa = a[surface]; const sb = b[surface];
+    const sa = a[sKey]; const sb = b[sKey];
     if (sortBy === 'win_rate') return sb.win_rate - sa.win_rate;
     if (sortBy === 'rank') return a.rank - b.rank;
     if (sortBy === 'elo') return b.elo[eloSurf] - a.elo[eloSurf];
@@ -486,6 +228,8 @@ function renderTable() {
     if (sortBy === 'second_win') return sb.second_serve_win_pct - sa.second_serve_win_pct;
     if (sortBy === 'bp_save') return sb.bp_save_pct - sa.bp_save_pct;
     if (sortBy === 'bp_convert') return sb.bp_convert_pct - sa.bp_convert_pct;
+    if (sortBy === 'tb_win') return sb.tb_win_rate - sa.tb_win_rate;
+    if (sortBy === 'dec_set') return sb.dec_set_win_rate - sa.dec_set_win_rate;
     if (sortBy === 'aces') return sb.avg_aces - sa.avg_aces;
     if (sortBy === 'ace_df') return sb.ace_df_ratio - sa.ace_df_ratio;
     return 0;
@@ -496,13 +240,13 @@ function renderTable() {
   tbody.innerHTML = '';
 
   filtered.forEach(p => {
-    const s = p[surface];
+    const s = p[sKey];
     if (!s || s.matches === 0) return;
     const oddsColor = p.odds === 'N/A' ? '#555' : p.odds.startsWith('+') ? '#4CAF50' : '#4488ff';
-    const safeName = p.name.replace(/'/g, "\\\\'");
     const eloVal = p.elo[eloSurf];
     const eloTrend = eloSurf === 'overall' ? '—' : p.elo[eloSurf + '_trend'];
     const trendClass = getTrendClass(eloTrend);
+    const safeName = p.name.replace(/'/g, "\\\\'");
     const row = document.createElement('tr');
     row.innerHTML =
       '<td class="player-name">' + p.name + '</td>' +
@@ -520,6 +264,10 @@ function renderTable() {
       '<td><span class="stat-cell" style="background:' + getColor(s.second_serve_win_pct,55,48) + '">' + s.second_serve_win_pct + '%</span></td>' +
       '<td><span class="stat-cell" style="background:' + getColor(s.bp_save_pct,68,62) + '">' + s.bp_save_pct + '%</span></td>' +
       '<td><span class="stat-cell" style="background:' + getColor(s.bp_convert_pct,45,35) + '">' + s.bp_convert_pct + '%</span></td>' +
+      '<td><span class="stat-cell" style="background:' + getColor(s.ret_first_won_pct,32,27) + '">' + s.ret_first_won_pct + '%</span></td>' +
+      '<td><span class="stat-cell" style="background:' + getColor(s.ret_second_won_pct,52,45) + '">' + s.ret_second_won_pct + '%</span></td>' +
+      '<td><span class="stat-cell" style="background:' + getColor(s.tb_win_rate,60,50) + '">' + s.tb_win_rate + '%</span></td>' +
+      '<td><span class="stat-cell" style="background:' + getColor(s.dec_set_win_rate,65,50) + '">' + s.dec_set_win_rate + '%</span></td>' +
       '<td>' + s.avg_aces + '</td>' +
       '<td>' + s.avg_df + '</td>' +
       '<td>' + s.ace_df_ratio + '</td>' +
@@ -530,8 +278,7 @@ function renderTable() {
     tbody.appendChild(row);
   });
 }
-var currentPlayer = '';
-var selectedOpp = '';
+var currentPlayer = '', selectedOpp = '';
 function openH2H(playerName) {
   currentPlayer = playerName;
   selectedOpp = '';
@@ -541,19 +288,13 @@ function openH2H(playerName) {
   document.getElementById('h2hResults').innerHTML = '';
   document.getElementById('h2hModal').classList.add('active');
 }
-function closeH2H() {
-  document.getElementById('h2hModal').classList.remove('active');
-}
+function closeH2H() { document.getElementById('h2hModal').classList.remove('active'); }
 function showOppSugg(val) {
   var box = document.getElementById('oppSugg');
   if (val.length < 2) { box.innerHTML = ''; return; }
   var v = val.toLowerCase();
-  var found = tennisData.map(p => p.name)
-    .filter(n => n.toLowerCase().includes(v) && n !== currentPlayer)
-    .slice(0, 8);
-  box.innerHTML = found.map(n =>
-    '<div class="sugg-item" onclick="pickOpp(this.textContent)">' + n + '</div>'
-  ).join('');
+  var found = tennisData.map(p => p.name).filter(n => n.toLowerCase().includes(v) && n !== currentPlayer).slice(0, 8);
+  box.innerHTML = found.map(n => '<div class="sugg-item" onclick="pickOpp(this.textContent)">' + n + '</div>').join('');
 }
 function pickOpp(name) {
   selectedOpp = name;
@@ -593,136 +334,127 @@ function runH2H() {
   });
   var sorted = h2h.slice().sort((a,b)=>parseInt(b.d)-parseInt(a.d));
   var mHTML = sorted.map(m =>
-    '<div class="match-card">'+
-      '<div><span class="mwinner">'+m.w+'</span> def. <span style="color:#888">'+m.l+'</span> <span class="mscore">'+m.sc+'</span></div>'+
-      '<div class="mmeta">'+getLvlPill(m.lv)+getSurfPill(m.s)+'<span>'+m.t+' '+m.d.substring(0,4)+'</span></div>'+
-    '</div>'
+    '<div class="match-card"><div><span class="mwinner">'+m.w+'</span> def. <span style="color:#888">'+m.l+'</span> <span class="mscore">'+m.sc+'</span></div>' +
+    '<div class="mmeta">'+getLvlPill(m.lv)+getSurfPill(m.s)+'<span>'+m.t+' '+m.d.substring(0,4)+'</span></div></div>'
   ).join('');
   document.getElementById('h2hResults').innerHTML =
-    '<div class="h2h-scoreboard">'+
-      '<div><div class="h2h-pname">'+p1+'</div><div class="h2h-wins">'+p1w+'</div></div>'+
-      '<div class="h2h-vs">VS</div>'+
-      '<div><div class="h2h-pname">'+p2+'</div><div class="h2h-wins">'+p2w+'</div></div>'+
-    '</div>'+
-    '<div class="surf-row">'+surfHTML+'</div>'+
-    '<div class="meetings-hdr">All Meetings ('+h2h.length+')</div>'+
-    mHTML;
+    '<div class="h2h-scoreboard"><div><div class="h2h-pname">'+p1+'</div><div class="h2h-wins">'+p1w+'</div></div>' +
+    '<div class="h2h-vs">VS</div><div><div class="h2h-pname">'+p2+'</div><div class="h2h-wins">'+p2w+'</div></div></div>' +
+    '<div class="surf-row">'+surfHTML+'</div>' +
+    '<div class="meetings-hdr">All Meetings ('+h2h.length+')</div>'+mHTML;
 }
-document.getElementById('h2hModal').addEventListener('click', function(e) {
-  if (e.target === this) closeH2H();
-});
-populateCountries();
+document.getElementById('h2hModal').addEventListener('click', function(e) { if (e.target === this) closeH2H(); });
+populateFilters();
 renderTable();
 """
 
-    html_parts = [
-        '<!DOCTYPE html><html><head>',
-        '<title>The Gain Line - ATP Tennis</title>',
-        '<style>', css, '</style>',
-        '</head><body>',
-        '<div class="header">',
-        '<div class="logo">THE <span>GAIN</span> LINE</div>',
-        '<div class="nav-tabs">',
-        '<div class="nav-tab" onclick="location.href=\'prop_matrix.html\'">Super Rugby Pacific</div>',
-        '<div class="nav-tab" onclick="location.href=\'epl_matrix.html\'">EPL Soccer</div>',
-        '<div class="nav-tab active">ATP Tennis</div>',
-        '<div class="nav-tab" onclick="location.href=\'wta_matrix.html\'">WTA Tennis</div>',
-        '</div></div>',
-        '<div class="controls">',
-        '<div class="control-group"><span class="control-label">Surface / Context</span>',
-        '<select id="surfaceFilter" onchange="renderTable()">',
-        '<option value="clay">Clay Court</option>',
-        '<option value="hard">Hard Court</option>',
-        '<option value="grass">Grass Court</option>',
-        '<option value="all">All Surfaces</option>',
-        '<option value="form">Last 6 Months</option>',
-        '<option value="grandslam">Grand Slams Only</option>',
-        '<option value="masters">Masters Only</option>',
-        '</select></div>',
-        '<div class="control-group"><span class="control-label">Country</span>',
-        '<select id="countryFilter" onchange="renderTable()"><option value="all">All Countries</option></select></div>',
-        '<div class="control-group"><span class="control-label">Hand</span>',
-        '<select id="handFilter" onchange="renderTable()">',
-        '<option value="all">All</option>',
-        '<option value="R">Right</option>',
-        '<option value="L">Left</option>',
-        '</select></div>',
-        '<div class="control-group"><span class="control-label">Min Matches</span>',
-        '<select id="minMatches" onchange="renderTable()">',
-        '<option value="0">Any</option>',
-        '<option value="10">10+</option>',
-        '<option value="20" selected>20+</option>',
-        '<option value="30">30+</option>',
-        '<option value="50">50+</option>',
-        '</select></div>',
-        '<div class="control-group"><span class="control-label">Sort By</span>',
-        '<select id="sortBy" onchange="renderTable()">',
-        '<option value="win_rate">Win Rate</option>',
-        '<option value="rank">ATP Ranking</option>',
-        '<option value="elo">Elo Rating</option>',
-        '<option value="tpw">TPW%</option>',
-        '<option value="dominance">Dominance Ratio</option>',
-        '<option value="first_win">1st Serve Win%</option>',
-        '<option value="second_win">2nd Serve Win%</option>',
-        '<option value="bp_save">BP Save%</option>',
-        '<option value="bp_convert">BP Convert%</option>',
-        '<option value="aces">Avg Aces</option>',
-        '<option value="ace_df">Ace/DF Ratio</option>',
-        '</select></div>',
-        '<div class="control-group search-box"><span class="control-label">Search Player</span>',
-        '<input type="text" id="searchBox" placeholder="Search player name..." oninput="renderTable()"></div>',
-        '</div>',
-        '<div class="container">',
-        '<div class="matrix-title">ATP Tennis Matrix <span class="count-badge" id="playerCount"></span></div>',
-        '<div class="matrix-subtitle" id="matrixSubtitle">Clay Court Stats | 2022-2026 Data | Updated Daily</div>',
-        '<div class="legend">',
-        '<div class="legend-item"><div class="legend-box" style="background:#1a7a1a"></div>Elite</div>',
-        '<div class="legend-item"><div class="legend-box" style="background:#7a6a00"></div>Good</div>',
-        '<div class="legend-item"><div class="legend-box" style="background:#7a1a1a"></div>Weak</div>',
-        '<div class="legend-item"><span class="trend-up2">↑↑</span> Strong rise</div>',
-        '<div class="legend-item"><span class="trend-up1">↑</span> Rising</div>',
-        '<div class="legend-item"><span class="trend-down1">↓</span> Falling</div>',
-        '<div class="legend-item"><span class="trend-down2">↓↓</span> Sharp fall</div>',
-        '</div>',
-        '<table><thead><tr>',
-        '<th class="left">PLAYER</th><th>CTY</th><th>RNK</th><th>AGE</th><th>HT</th><th>HND</th>',
-        '<th>M</th><th>WIN%</th><th>TPW%</th><th>DR</th>',
-        '<th>1ST IN%</th><th>1ST WIN%</th><th>2ND WIN%</th>',
-        '<th>BP SAV%</th><th>BP CNV%</th>',
-        '<th>ACES</th><th>DF</th><th>A/DF</th>',
-        '<th>ELO</th><th>TREND</th>',
-        '<th>ODDS</th><th>H2H</th>',
-        '</tr></thead>',
-        '<tbody id="tableBody"></tbody></table>',
-        '<div class="footer">The Gain Line | ATP Top 100 | Sackmann 2022-2024 + TennisMyLife 2025-2026 | Elo Ratings Calculated | Updated Daily</div>',
-        '</div>',
-        '<div class="modal-overlay" id="h2hModal">',
-        '<div class="modal">',
-        '<div class="modal-header">',
-        '<div class="modal-title" id="modalTitle">H2H Lookup</div>',
-        '<button class="modal-close" onclick="closeH2H()">&#x2715;</button>',
-        '</div>',
-        '<input class="h2h-search" id="oppInput" type="text" placeholder="Type opponent name..." oninput="showOppSugg(this.value)" autocomplete="off">',
-        '<div class="sugg-box" id="oppSugg"></div>',
-        '<button class="h2h-lookup-btn" onclick="runH2H()">LOOK UP H2H</button>',
-        '<div id="h2hResults"></div>',
-        '</div></div>',
-        '<script>',
-        js_data,
-        js_code,
-        '</script>',
-        '</body></html>'
-    ]
+html_parts = [
+    '<!DOCTYPE html><html><head>',
+    '<title>The Gain Line - ATP Tennis</title>',
+    '<style>', css, '</style>',
+    '</head><body>',
+    '<div class="header">',
+    '<div class="logo">THE <span>GAIN</span> LINE</div>',
+    '<div class="nav-tabs">',
+    '<div class="nav-tab" onclick="location.href=\'prop_matrix.html\'">Super Rugby Pacific</div>',
+    '<div class="nav-tab" onclick="location.href=\'epl_matrix.html\'">EPL Soccer</div>',
+    '<div class="nav-tab active">ATP Tennis</div>',
+    '<div class="nav-tab" onclick="location.href=\'wta_matrix.html\'">WTA Tennis</div>',
+    '<div class="nav-tab" onclick="location.href=\'match_simulator.html\'">Simulator</div>',
+    '</div></div>',
+    '<div class="controls">',
+    '<div class="control-group"><span class="control-label">Surface / Context</span>',
+    '<select id="surfaceFilter" onchange="renderTable()">',
+    '<option value="clay">Clay Court</option>',
+    '<option value="hard">Hard Court</option>',
+    '<option value="grass">Grass Court</option>',
+    '<option value="all">All Surfaces</option>',
+    '<option value="form_6m">Last 6 Months</option>',
+    '<option value="last5">Last 5 Matches</option>',
+    '<option value="last10">Last 10 Matches</option>',
+    '<option value="last15">Last 15 Matches</option>',
+    '<option value="clay_last10">Clay — Last 10</option>',
+    '<option value="hard_last10">Hard — Last 10</option>',
+    '<option value="grass_last10">Grass — Last 10</option>',
+    '<option value="grandslam">Grand Slams Only</option>',
+    '<option value="masters">Masters Only</option>',
+    '</select></div>',
+    '<div class="control-group"><span class="control-label">Country</span>',
+    '<select id="countryFilter" onchange="renderTable()"><option value="all">All Countries</option></select></div>',
+    '<div class="control-group"><span class="control-label">Hand</span>',
+    '<select id="handFilter" onchange="renderTable()">',
+    '<option value="all">All</option><option value="R">Right</option><option value="L">Left</option>',
+    '</select></div>',
+    '<div class="control-group"><span class="control-label">Min Matches</span>',
+    '<select id="minMatches" onchange="renderTable()">',
+    '<option value="0">Any</option><option value="5">5+</option><option value="10">10+</option>',
+    '<option value="20" selected>20+</option><option value="30">30+</option><option value="50">50+</option>',
+    '</select></div>',
+    '<div class="control-group"><span class="control-label">Sort By</span>',
+    '<select id="sortBy" onchange="renderTable()">',
+    '<option value="win_rate">Win Rate</option>',
+    '<option value="rank">ATP Ranking</option>',
+    '<option value="elo">Elo Rating</option>',
+    '<option value="tpw">TPW%</option>',
+    '<option value="dominance">Dominance Ratio</option>',
+    '<option value="first_win">1st Serve Win%</option>',
+    '<option value="second_win">2nd Serve Win%</option>',
+    '<option value="bp_save">BP Save%</option>',
+    '<option value="bp_convert">BP Convert%</option>',
+    '<option value="tb_win">Tiebreak Win%</option>',
+    '<option value="dec_set">Deciding Set Win%</option>',
+    '<option value="aces">Avg Aces</option>',
+    '<option value="ace_df">Ace/DF Ratio</option>',
+    '</select></div>',
+    '<div class="control-group search-box"><span class="control-label">Search Player</span>',
+    '<input type="text" id="searchBox" placeholder="Search player name..." oninput="renderTable()"></div>',
+    '</div>',
+    '<div class="container">',
+    '<div class="matrix-title">ATP Tennis Matrix <span class="count-badge" id="playerCount"></span></div>',
+    '<div class="matrix-subtitle" id="matrixSubtitle">Clay Court Stats | 2022-2026 | Updated ' + generated + '</div>',
+    '<div class="legend">',
+    '<div class="legend-item"><div class="legend-box" style="background:#1a7a1a"></div>Elite</div>',
+    '<div class="legend-item"><div class="legend-box" style="background:#7a6a00"></div>Good</div>',
+    '<div class="legend-item"><div class="legend-box" style="background:#7a1a1a"></div>Weak</div>',
+    '<div class="legend-item"><span class="trend-up2">↑↑</span> Strong rise</div>',
+    '<div class="legend-item"><span class="trend-up1">↑</span> Rising</div>',
+    '<div class="legend-item"><span class="trend-down1">↓</span> Falling</div>',
+    '<div class="legend-item"><span class="trend-down2">↓↓</span> Sharp fall</div>',
+    '</div>',
+    '<table><thead><tr>',
+    '<th class="left">PLAYER</th><th>CTY</th><th>RNK</th><th>AGE</th><th>HT</th><th>HND</th>',
+    '<th>M</th><th>WIN%</th><th>TPW%</th><th>DR</th>',
+    '<th>1ST IN%</th><th>1ST WIN%</th><th>2ND WIN%</th>',
+    '<th>BP SAV%</th><th>BP CNV%</th>',
+    '<th>RET 1ST%</th><th>RET 2ND%</th>',
+    '<th>TB WIN%</th><th>DEC SET%</th>',
+    '<th>ACES</th><th>DF</th><th>A/DF</th>',
+    '<th>ELO</th><th>TREND</th>',
+    '<th>ODDS</th><th>H2H</th>',
+    '</tr></thead>',
+    '<tbody id="tableBody"></tbody></table>',
+    '<div class="footer">The Gain Line | ATP 200 Players | Sackmann 2022-2024 + TennisMyLife 2025-2026 | Generated: ' + generated + '</div>',
+    '</div>',
+    '<div class="modal-overlay" id="h2hModal">',
+    '<div class="modal">',
+    '<div class="modal-header">',
+    '<div class="modal-title" id="modalTitle">H2H Lookup</div>',
+    '<button class="modal-close" onclick="closeH2H()">&#x2715;</button>',
+    '</div>',
+    '<input class="h2h-search" id="oppInput" type="text" placeholder="Type opponent name..." oninput="showOppSugg(this.value)" autocomplete="off">',
+    '<div class="sugg-box" id="oppSugg"></div>',
+    '<button class="h2h-lookup-btn" onclick="runH2H()">LOOK UP H2H</button>',
+    '<div id="h2hResults"></div>',
+    '</div></div>',
+    '<script>', js_data, js_code, '</script>',
+    '</body></html>'
+]
 
-    html = ''.join(html_parts)
+html = ''.join(html_parts)
 
-    filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tennis_matrix.html')
-    with open(filepath, 'w', encoding='utf-8') as f:
-        f.write(html)
+filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tennis_matrix.html')
+with open(filepath, 'w', encoding='utf-8') as f:
+    f.write(html)
 
-    print("\nTennis Matrix with Elo ratings generated! Opening in browser...")
-    webbrowser.open('file:///' + filepath)
-
-except Exception as e:
-    print("Error: " + str(e))
-    traceback.print_exc()
+print("ATP Tennis Matrix generated! Opening in browser...")
+webbrowser.open('file:///' + filepath)
