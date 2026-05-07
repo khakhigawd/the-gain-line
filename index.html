@@ -83,7 +83,11 @@ body { font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; overflo
 .divider { height: 1px; background: linear-gradient(to right, transparent, #333, transparent); margin: 0 30px; }
 </style>
 </head>
-<body>
+<body><script>
+if (!sessionStorage.getItem('layback_auth')) {
+  window.location.href = 'password.html';
+}
+</script>
 
 <div class="header">
   <div class="logo">LAYBACK <span>ANALYTICS</span></div>

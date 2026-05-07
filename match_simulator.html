@@ -65,7 +65,11 @@ select:focus { outline: none; border-color: #4CAF50; }
 .warning { background: #1a1a00; border: 1px solid #444400; border-radius: 6px; padding: 10px 15px; font-size: 12px; color: #888800; margin-bottom: 15px; }
 </style>
 </head>
-<body>
+<body><script>
+if (!sessionStorage.getItem('layback_auth')) {
+  window.location.href = 'password.html';
+}
+</script>
 <div class="header">
   <div class="logo">LAYBACK ANALYTICS</div>
   <div class="nav-tabs">

@@ -39,7 +39,11 @@ tr:hover { background: #111; }
 .count-badge { background: #333; color: #888; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
 </style>
 </head>
-<body>
+<body><script>
+if (!sessionStorage.getItem('layback_auth')) {
+  window.location.href = 'password.html';
+}
+</script>
 
 <div class="header">
   <div class="logo">LAYBACK ANALYTICS</div>

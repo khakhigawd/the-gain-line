@@ -38,7 +38,11 @@ tr:hover { background: #111; }
 .legend-box { width: 12px; height: 12px; border-radius: 2px; }
 </style>
 </head>
-<body>
+<body><script>
+if (!sessionStorage.getItem('layback_auth')) {
+  window.location.href = 'password.html';
+}
+</script>
 
 <div class="header">
   <div class="logo">LAYBACK ANALYTICS</div>
