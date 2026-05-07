@@ -1,26 +1,16 @@
 import os
 
-print("Rebranding to Layback Analytics...")
+print("Fixing branding across all files...")
 
-files = {
-    'prop_matrix.html': 'Rugby',
-    'epl_matrix.html': 'EPL Soccer',
-    'tennis_matrix.html': 'ATP Tennis',
-    'wta_matrix.html': 'WTA Tennis',
-    'match_simulator.html': 'Simulator',
-    'index.html': 'Home',
-}
-
-replacements = [
-    ('THE <span>GAIN</span> LINE', '📊 LAYBACK ANALYTICS'),
-    ('The Gain Line', 'Layback Analytics'),
-    ('THE GAIN LINE', 'LAYBACK ANALYTICS'),
-    ('the-gain-line', 'laybackanalytics'),
-    ('The Gain Line |', 'Layback Analytics |'),
-    ('<title>The Gain Line', '<title>Layback Analytics'),
+files = [
+    'prop_matrix.html',
+    'epl_matrix.html',
+    'tennis_matrix.html',
+    'wta_matrix.html',
+    'match_simulator.html',
 ]
 
-for filename in files.keys():
+for filename in files:
     filepath = os.path.join('C:\\Users\\bayet\\RugbyEdge', filename)
     if not os.path.exists(filepath):
         print("Skipping " + filename + " - not found")
@@ -29,13 +19,19 @@ for filename in files.keys():
     with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
         content = f.read()
 
-    for old, new in replacements:
-        content = content.replace(old, new)
+    # Fix charset - add UTF-8 meta tag if not present
+    if '<meta charset' not in content:
+        content = content.replace('<head>', '<head>\n<meta charset="UTF-8">')
 
-    with open(filepath, 'w', encoding='utf-8', errors='ignore') as f:
+    # Fix logo text - remove any garbled emoji versions
+    content = content.replace('ðŸ"Š LAYBACK ANALYTICS', 'LAYBACK ANALYTICS')
+    content = content.replace('📊 LAYBACK ANALYTICS', 'LAYBACK ANALYTICS')
+    content = content.replace('<div class="logo">LAYBACK <span>ANALYTICS</span></div>',
+                             '<div class="logo">LAYBACK <span>ANALYTICS</span></div>')
+
+    with open(filepath, 'w', encoding='utf-8') as f:
         f.write(content)
 
-    print("Updated " + filename)
+    print("Fixed " + filename)
 
-print("\nRebrand complete!")
-print("Run: git add . && git commit -m 'Rebrand to Layback Analytics' && git push")
+print("\nDone! Run: git add . && git commit -m 'Fix encoding in matrix files' && git push")
