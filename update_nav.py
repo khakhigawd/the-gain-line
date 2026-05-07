@@ -1,45 +1,41 @@
 import os
 
-print("Updating navigation tabs in all files...")
+print("Rebranding to Layback Analytics...")
 
 files = {
-    'prop_matrix.html': 'Super Rugby Pacific',
+    'prop_matrix.html': 'Rugby',
     'epl_matrix.html': 'EPL Soccer',
     'tennis_matrix.html': 'ATP Tennis',
     'wta_matrix.html': 'WTA Tennis',
+    'match_simulator.html': 'Simulator',
+    'index.html': 'Home',
 }
 
-for filename, active_tab in files.items():
-    filepath = os.path.join('C:\\Users\\bayet\\RugbyEdge', filename)
+replacements = [
+    ('THE <span>GAIN</span> LINE', '📊 LAYBACK ANALYTICS'),
+    ('The Gain Line', 'Layback Analytics'),
+    ('THE GAIN LINE', 'LAYBACK ANALYTICS'),
+    ('the-gain-line', 'laybackanalytics'),
+    ('The Gain Line |', 'Layback Analytics |'),
+    ('<title>The Gain Line', '<title>Layback Analytics'),
+]
 
+for filename in files.keys():
+    filepath = os.path.join('C:\\Users\\bayet\\RugbyEdge', filename)
     if not os.path.exists(filepath):
-        print("Skipping " + filename + " - file not found")
+        print("Skipping " + filename + " - not found")
         continue
 
     with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
         content = f.read()
 
-    nav = '<div class="nav-tabs">\n'
-    for fname, label in files.items():
-        if label == active_tab:
-            nav += '<div class="nav-tab active" onclick="location.href=\'' + fname + '\'">' + label + '</div>\n'
-        else:
-            nav += '<div class="nav-tab" onclick="location.href=\'' + fname + '\'">' + label + '</div>\n'
-    nav += '</div>'
-
-    start = content.find('<div class="nav-tabs">')
-    end = content.find('</div>', start) + 6
-
-    if start == -1:
-        print("Could not find nav-tabs in " + filename)
-        continue
-
-    new_content = content[:start] + nav + content[end:]
+    for old, new in replacements:
+        content = content.replace(old, new)
 
     with open(filepath, 'w', encoding='utf-8', errors='ignore') as f:
-        f.write(new_content)
+        f.write(content)
 
     print("Updated " + filename)
 
-print("\nAll navigation tabs updated!")
-print("Open any HTML file and the tabs will navigate between all four sports.")
+print("\nRebrand complete!")
+print("Run: git add . && git commit -m 'Rebrand to Layback Analytics' && git push")
