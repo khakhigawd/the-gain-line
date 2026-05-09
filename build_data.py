@@ -350,8 +350,8 @@ def build_tour(tour_name, match_urls, players_url, is_wta=False):
 
     # Get all active players sorted by ranking
     sorted_players = sorted(rankings.items(), key=lambda x: x[1])
-    # Take top 200
-    top_players = sorted_players[:200]
+    # Take top 300
+    top_players = sorted_players[:300]
 
     print("Processing " + str(len(top_players)) + " players...")
 
