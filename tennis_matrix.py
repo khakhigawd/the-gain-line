@@ -350,11 +350,11 @@ renderTable();
 
 html_parts = [
     '<!DOCTYPE html><html><head>',
-    '<title>The Gain Line - ATP Tennis</title>',
+    '<title>Layback Analytics - ATP Tennis</title>',
     '<style>', css, '</style>',
     '</head><body>',
     '<div class="header">',
-    '<div class="logo">THE <span>GAIN</span> LINE</div>',
+    '<div class="logo">LAYBACK <span>ANALYTICS</span></div>',
     '<div class="nav-tabs">',
     '<div class="nav-tab" onclick="location.href=\'prop_matrix.html\'">Super Rugby Pacific</div>',
     '<div class="nav-tab" onclick="location.href=\'epl_matrix.html\'">EPL Soccer</div>',

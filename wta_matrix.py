@@ -1,9 +1,8 @@
 import json
-import requests
 import webbrowser
 import os
 
-print("Building WTA Tennis Matrix from cached data...")
+print("Building Layback Analytics — WTA Tennis Matrix...")
 
 with open('wta_data.json', 'r', encoding='utf-8') as f:
     data = json.load(f)
@@ -100,10 +99,10 @@ function getColor(val, high, mid) {
   return '#7a1a1a';
 }
 function getTrendClass(trend) {
-  if (trend === '↑↑') return 'trend-up2';
-  if (trend === '↑') return 'trend-up1';
-  if (trend === '↓↓') return 'trend-down2';
-  if (trend === '↓') return 'trend-down1';
+  if (trend === '\u2191\u2191') return 'trend-up2';
+  if (trend === '\u2191') return 'trend-up1';
+  if (trend === '\u2193\u2193') return 'trend-down2';
+  if (trend === '\u2193') return 'trend-down1';
   return 'trend-flat';
 }
 function getEloColor(elo) {
@@ -147,17 +146,17 @@ function renderTable() {
   const sKey = getSurfaceKey(surface);
   const eloSurf = getEloSurface(surface);
   const subtitles = {
-    'clay': 'Clay Court Stats | 2022-2024 | Madrid Open Preview',
+    'clay': 'Clay Court Stats | 2022-2024',
     'hard': 'Hard Court Stats | 2022-2024',
-    'grass': 'Grass Court Stats | 2022-2024 | Wimbledon Preview',
+    'grass': 'Grass Court Stats | 2022-2024',
     'all': 'All Surface Stats | 2022-2024',
     'form_6m': 'Last 6 Months Form',
     'last5': 'Last 5 Matches',
     'last10': 'Last 10 Matches',
     'last15': 'Last 15 Matches',
-    'clay_last10': 'Clay — Last 10 Matches',
-    'hard_last10': 'Hard — Last 10 Matches',
-    'grass_last10': 'Grass — Last 10 Matches',
+    'clay_last10': 'Clay - Last 10 Matches',
+    'hard_last10': 'Hard - Last 10 Matches',
+    'grass_last10': 'Grass - Last 10 Matches',
     'grandslam': 'Grand Slam Performance | 2022-2024',
     'masters': 'WTA 1000 Performance | 2022-2024'
   };
@@ -194,7 +193,7 @@ function renderTable() {
     const s = p[sKey];
     if (!s || s.matches === 0) return;
     const eloVal = p.elo[eloSurf];
-    const eloTrend = eloSurf === 'overall' ? '—' : p.elo[eloSurf + '_trend'];
+    const eloTrend = eloSurf === 'overall' ? '-' : p.elo[eloSurf + '_trend'];
     const trendClass = getTrendClass(eloTrend);
     const safeName = p.name.replace(/'/g, "\\\\'");
     const row = document.createElement('tr');
@@ -299,11 +298,13 @@ renderTable();
 
 html_parts = [
     '<!DOCTYPE html><html><head>',
-    '<title>The Gain Line - WTA Tennis</title>',
+    '<meta charset="UTF-8">',
+    '<title>Layback Analytics - WTA Tennis</title>',
     '<style>', css, '</style>',
     '</head><body>',
+    '<script>if (!sessionStorage.getItem("layback_auth")) { window.location.href = "password.html"; }</script>',
     '<div class="header">',
-    '<div class="logo">THE <span>GAIN</span> LINE</div>',
+    '<div class="logo">LAYBACK <span>ANALYTICS</span></div>',
     '<div class="nav-tabs">',
     '<div class="nav-tab" onclick="location.href=\'prop_matrix.html\'">Super Rugby Pacific</div>',
     '<div class="nav-tab" onclick="location.href=\'epl_matrix.html\'">EPL Soccer</div>',
@@ -322,9 +323,9 @@ html_parts = [
     '<option value="last5">Last 5 Matches</option>',
     '<option value="last10">Last 10 Matches</option>',
     '<option value="last15">Last 15 Matches</option>',
-    '<option value="clay_last10">Clay — Last 10</option>',
-    '<option value="hard_last10">Hard — Last 10</option>',
-    '<option value="grass_last10">Grass — Last 10</option>',
+    '<option value="clay_last10">Clay - Last 10</option>',
+    '<option value="hard_last10">Hard - Last 10</option>',
+    '<option value="grass_last10">Grass - Last 10</option>',
     '<option value="grandslam">Grand Slams Only</option>',
     '<option value="masters">WTA 1000 Only</option>',
     '</select></div>',
@@ -365,10 +366,10 @@ html_parts = [
     '<div class="legend-item"><div class="legend-box" style="background:#1a7a1a"></div>Elite</div>',
     '<div class="legend-item"><div class="legend-box" style="background:#7a6a00"></div>Good</div>',
     '<div class="legend-item"><div class="legend-box" style="background:#7a1a1a"></div>Weak</div>',
-    '<div class="legend-item"><span class="trend-up2">↑↑</span> Strong rise</div>',
-    '<div class="legend-item"><span class="trend-up1">↑</span> Rising</div>',
-    '<div class="legend-item"><span class="trend-down1">↓</span> Falling</div>',
-    '<div class="legend-item"><span class="trend-down2">↓↓</span> Sharp fall</div>',
+    '<div class="legend-item"><span class="trend-up2">&#8593;&#8593;</span> Strong rise</div>',
+    '<div class="legend-item"><span class="trend-up1">&#8593;</span> Rising</div>',
+    '<div class="legend-item"><span class="trend-down1">&#8595;</span> Falling</div>',
+    '<div class="legend-item"><span class="trend-down2">&#8595;&#8595;</span> Sharp fall</div>',
     '</div>',
     '<table><thead><tr>',
     '<th class="left">PLAYER</th><th>CTY</th><th>RNK</th><th>AGE</th><th>HT</th><th>HND</th>',
@@ -381,7 +382,7 @@ html_parts = [
     '<th>ELO</th><th>TREND</th><th>H2H</th>',
     '</tr></thead>',
     '<tbody id="tableBody"></tbody></table>',
-    '<div class="footer">The Gain Line | WTA 200 Players | Sackmann 2022-2024 | Generated: ' + generated + '</div>',
+    '<div class="footer">Layback Analytics | WTA 300 Players | Sackmann 2022-2024 | Generated: ' + generated + '</div>',
     '</div>',
     '<div class="modal-overlay" id="h2hModal">',
     '<div class="modal">',
@@ -404,5 +405,5 @@ filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'wta_matrix.
 with open(filepath, 'w', encoding='utf-8') as f:
     f.write(html)
 
-print("WTA Tennis Matrix generated! Opening in browser...")
+print("Layback Analytics WTA Tennis Matrix generated!")
 webbrowser.open('file:///' + filepath)
