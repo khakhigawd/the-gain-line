@@ -3,9 +3,8 @@ import requests
 import webbrowser
 import os
 
-print("Building ATP Tennis Matrix from cached data...")
+print("Building Layback Analytics — ATP Tennis Matrix...")
 
-# Load pre-built data
 with open('atp_data.json', 'r', encoding='utf-8') as f:
     data = json.load(f)
 
@@ -15,10 +14,9 @@ generated = data['generated']
 print("Loaded " + str(len(players)) + " players, " + str(len(matches_list)) + " matches")
 print("Data generated: " + generated)
 
-# Fetch live odds
 def get_tennis_odds():
     try:
-        url = 'https://api.the-odds-api.com/v4/sports/tennis_atp_madrid_open/odds/'
+        url = 'https://api.the-odds-api.com/v4/sports/tennis_atp_rome/odds/'
         params = {'apiKey': 'a3fd838c65e47cfdce22a13933f01a75', 'regions': 'us', 'markets': 'h2h', 'oddsFormat': 'american'}
         r = requests.get(url, params=params)
         data = r.json()
@@ -42,7 +40,6 @@ print("Fetching live odds...")
 odds = get_tennis_odds()
 print("Odds found for " + str(len(odds)) + " players")
 
-# Inject odds into player data
 for p in players:
     price = odds.get(p['name'], None)
     if price:
@@ -76,7 +73,7 @@ th { background: #1a1a1a; padding: 8px 10px; text-align: center; font-size: 10px
 th.left { text-align: left; }
 td { padding: 8px 10px; text-align: center; border-bottom: 1px solid #151515; white-space: nowrap; }
 .player-name { text-align: left; font-weight: bold; font-size: 13px; }
-.country-badge { font-size: 10px; padding: 2px 5px; border-radius: 3px; background: #222; color: #aaa; }
+.country-badge { font-size: 18px; cursor: default; }
 .stat-cell { font-weight: bold; font-size: 13px; border-radius: 3px; padding: 4px 8px; display: inline-block; min-width: 45px; }
 .odds-cell { font-size: 12px; font-weight: bold; }
 tr:hover { background: #111; }
@@ -129,42 +126,53 @@ tr:hover { background: #111; }
 .sugg-item { padding: 8px 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #222; }
 .sugg-item:hover { background: #252525; color: #4CAF50; }
 """
+
 js_code = """
 function getFlag(ioc) {
   const map = {
-    'USA':'🇺🇸','ESP':'🇪🇸','FRA':'🇫🇷','GBR':'🇬🇧','GER':'🇩🇪','ITA':'🇮🇹',
-    'AUS':'🇦🇺','ARG':'🇦🇷','RUS':'🇷🇺','SRB':'🇷🇸','CAN':'🇨🇦','JPN':'🇯🇵',
-    'CHN':'🇨🇳','BRA':'🇧🇷','NOR':'🇳🇴','GRE':'🇬🇷','DEN':'🇩🇰','POL':'🇵🇱',
-    'CRO':'🇭🇷','AUT':'🇦🇹','SUI':'🇨🇭','BEL':'🇧🇪','NED':'🇳🇱','CZE':'🇨🇿',
-    'SVK':'🇸🇰','HUN':'🇭🇺','BUL':'🇧🇬','ROU':'🇷🇴','KAZ':'🇰🇿','UKR':'🇺🇦',
-    'BLR':'🇧🇾','KOR':'🇰🇷','RSA':'🇿🇦','CHI':'🇨🇱','COL':'🇨🇴','MEX':'🇲🇽',
-    'POR':'🇵🇹','SWE':'🇸🇪','FIN':'🇫🇮','NZL':'🇳🇿','IND':'🇮🇳','TUN':'🇹🇳',
-    'MAR':'🇲🇦','EGY':'🇪🇬','TPE':'🇹🇼','THA':'🇹🇭','INA':'🇮🇩','PHI':'🇵🇭',
-    'GEO':'🇬🇪','BIH':'🇧🇦','MDA':'🇲🇩','LUX':'🇱🇺','ISR':'🇮🇱','URU':'🇺🇾',
-    'PAR':'🇵🇾','PER':'🇵🇪','ECU':'🇪🇨','VEN':'🇻🇪','BOL':'🇧🇴','CRC':'🇨🇷',
-    'LAT':'🇱🇻','LTU':'🇱🇹','EST':'🇪🇪','ISL':'🇮🇸','IRL':'🇮🇪','MON':'🇲🇨',
-    'AND':'🇦🇩','MLT':'🇲🇹','CYP':'🇨🇾','ALB':'🇦🇱','MKD':'🇲🇰','MNE':'🇲🇪',
-    'AZE':'🇦🇿','ARM':'🇦🇲','UZB':'🇺🇿','TKM':'🇹🇲','KGZ':'🇰🇬','TJK':'🇹🇯',
-    'PAK':'🇵🇰','BAN':'🇧🇩','SRI':'🇱🇰','NEP':'🇳🇵','MAS':'🇲🇾','SGP':'🇸🇬',
-    'HKG':'🇭🇰','VIE':'🇻🇳','CAM':'🇰🇭','MYA':'🇲🇲','NGR':'🇳🇬','KEN':'🇰🇪',
-    'ETH':'🇪🇹','GHA':'🇬🇭','CMR':'🇨🇲','CIV':'🇨🇮','SEN':'🇸🇳','ZIM':'🇿🇼',
-    'BAH':'🇧🇸','JAM':'🇯🇲','TTO':'🇹🇹','CUB':'🇨🇺','DOM':'🇩🇴','PUR':'🇵🇷',
-    'FIJ':'🇫🇯','SAM':'🇼🇸','TON':'🇹🇴','PNG':'🇵🇬','NCA':'🇳🇮','GUA':'🇬🇹'
+    'USA':'\uD83C\uDDFA\uD83C\uDDF8','ESP':'\uD83C\uDDEA\uD83C\uDDF8','FRA':'\uD83C\uDDEB\uD83C\uDDF7',
+    'GBR':'\uD83C\uDDEC\uD83C\uDDE7','GER':'\uD83C\uDDE9\uD83C\uDDEA','ITA':'\uD83C\uDDEE\uD83C\uDDF9',
+    'AUS':'\uD83C\uDDE6\uD83C\uDDFA','ARG':'\uD83C\uDDE6\uD83C\uDDF7','RUS':'\uD83C\uDDF7\uD83C\uDDFA',
+    'SRB':'\uD83C\uDDF7\uD83C\uDDF8','CAN':'\uD83C\uDDE8\uD83C\uDDE6','JPN':'\uD83C\uDDEF\uD83C\uDDF5',
+    'CHN':'\uD83C\uDDE8\uD83C\uDDF3','BRA':'\uD83C\uDDE7\uD83C\uDDF7','NOR':'\uD83C\uDDF3\uD83C\uDDF4',
+    'GRE':'\uD83C\uDDEC\uD83C\uDDF7','DEN':'\uD83C\uDDE9\uD83C\uDDF0','POL':'\uD83C\uDDF5\uD83C\uDDF1',
+    'CRO':'\uD83C\uDDED\uD83C\uDDF7','AUT':'\uD83C\uDDE6\uD83C\uDDF9','SUI':'\uD83C\uDDE8\uD83C\uDDED',
+    'BEL':'\uD83C\uDDE7\uD83C\uDDEA','NED':'\uD83C\uDDF3\uD83C\uDDF1','CZE':'\uD83C\uDDE8\uD83C\uDDFF',
+    'SVK':'\uD83C\uDDF8\uD83C\uDDF0','HUN':'\uD83C\uDDED\uD83C\uDDFA','BUL':'\uD83C\uDDE7\uD83C\uDDEC',
+    'ROU':'\uD83C\uDDF7\uD83C\uDDF4','KAZ':'\uD83C\uDDF0\uD83C\uDDFF','UKR':'\uD83C\uDDFA\uD83C\uDDE6',
+    'BLR':'\uD83C\uDDE7\uD83C\uDDFE','KOR':'\uD83C\uDDF0\uD83C\uDDF7','RSA':'\uD83C\uDDFF\uD83C\uDDE6',
+    'CHI':'\uD83C\uDDE8\uD83C\uDDF1','COL':'\uD83C\uDDE8\uD83C\uDDF4','MEX':'\uD83C\uDDF2\uD83C\uDDFD',
+    'POR':'\uD83C\uDDF5\uD83C\uDDF9','SWE':'\uD83C\uDDF8\uD83C\uDDEA','FIN':'\uD83C\uDDEB\uD83C\uDDEE',
+    'NZL':'\uD83C\uDDF3\uD83C\uDDFF','IND':'\uD83C\uDDEE\uD83C\uDDF3','TUN':'\uD83C\uDDF9\uD83C\uDDF3',
+    'MAR':'\uD83C\uDDF2\uD83C\uDDE6','GEO':'\uD83C\uDDEC\uD83C\uDDEA','BIH':'\uD83C\uDDE7\uD83C\uDDE6',
+    'LAT':'\uD83C\uDDF1\uD83C\uDDFB','LTU':'\uD83C\uDDF1\uD83C\uDDF9','EST':'\uD83C\uDDEA\uD83C\uDDEA',
+    'AZE':'\uD83C\uDDE6\uD83C\uDDFF','ARM':'\uD83C\uDDE6\uD83C\uDDF2','UZB':'\uD83C\uDDFA\uD83C\uDDFF',
+    'TPE':'\uD83C\uDDF9\uD83C\uDDFC','MAS':'\uD83C\uDDF2\uD83C\uDDFE','SGP':'\uD83C\uDDF8\uD83C\uDDEC',
+    'HKG':'\uD83C\uDDED\uD83C\uDDF0','DOM':'\uD83C\uDDE9\uD83C\uDDF4','URU':'\uD83C\uDDFA\uD83C\uDDFE',
+    'PAR':'\uD83C\uDDF5\uD83C\uDDFE','PER':'\uD83C\uDDF5\uD83C\uDDEA','ECU':'\uD83C\uDDEA\uD83C\uDDE8',
+    'BOL':'\uD83C\uDDE7\uD83C\uDDF4','BAH':'\uD83C\uDDE7\uD83C\uDDF8','JAM':'\uD83C\uDDEF\uD83C\uDDF2',
+    'IRL':'\uD83C\uDDEE\uD83C\uDDEA','ISR':'\uD83C\uDDEE\uD83C\uDDF1','MDA':'\uD83C\uDDF2\uD83C\uDDE9',
+    'LUX':'\uD83C\uDDF1\uD83C\uDDFA','MON':'\uD83C\uDDF2\uD83C\uDDE8','NGR':'\uD83C\uDDF3\uD83C\uDDEC',
+    'KEN':'\uD83C\uDDF0\uD83C\uDDEA','THA':'\uD83C\uDDF9\uD83C\uDDED','VIE':'\uD83C\uDDFB\uD83C\uDDF3',
+    'PUR':'\uD83C\uDDF5\uD83C\uDDF7','CRC':'\uD83C\uDDE8\uD83C\uDDF7','PAN':'\uD83C\uDDF5\uD83C\uDDE6',
+    'ALG':'\uD83C\uDDE9\uD83C\uDDFF','EGY':'\uD83C\uDDEA\uD83C\uDDEC','SEN':'\uD83C\uDDF8\uD83C\uDDF3',
+    'CIV':'\uD83C\uDDE8\uD83C\uDDEE','GHA':'\uD83C\uDDEC\uD83C\uDDED','ZIM':'\uD83C\uDDFF\uD83C\uDDFC',
+    'AND':'\uD83C\uDDE6\uD83C\uDDE9','SMR':'\uD83C\uDDF8\uD83C\uDDF2','MNE':'\uD83C\uDDF2\uD83C\uDDEA',
+    'MKD':'\uD83C\uDDF2\uD83C\uDDF0','ALB':'\uD83C\uDDE6\uD83C\uDDF1','CYP':'\uD83C\uDDE8\uD83C\uDDFE',
+    'ISL':'\uD83C\uDDEE\uD83C\uDDF8','LIE':'\uD83C\uDDF1\uD83C\uDDEE','FIJ':'\uD83C\uDDEB\uD83C\uDDEF'
   };
   return map[ioc] || ioc;
 }
-function getColor(val, high, mid) {
-js_code = """
 function getColor(val, high, mid) {
   if (val >= high) return '#1a7a1a';
   if (val >= mid) return '#7a6a00';
   return '#7a1a1a';
 }
 function getTrendClass(trend) {
-  if (trend === '↑↑') return 'trend-up2';
-  if (trend === '↑') return 'trend-up1';
-  if (trend === '↓↓') return 'trend-down2';
-  if (trend === '↓') return 'trend-down1';
+  if (trend === '\u2191\u2191') return 'trend-up2';
+  if (trend === '\u2191') return 'trend-up1';
+  if (trend === '\u2193\u2193') return 'trend-down2';
+  if (trend === '\u2193') return 'trend-down1';
   return 'trend-flat';
 }
 function getEloColor(elo) {
@@ -179,25 +187,18 @@ function populateFilters() {
   const sel = document.getElementById('countryFilter');
   countries.forEach(c => {
     const opt = document.createElement('option');
-    opt.value = c; opt.textContent = c;
+    opt.value = c; opt.textContent = getFlag(c) + ' ' + c;
     sel.appendChild(opt);
   });
 }
 function getSurfaceKey(surface) {
-  if (surface === 'clay') return 'clay';
-  if (surface === 'hard') return 'hard';
-  if (surface === 'grass') return 'grass';
-  if (surface === 'all') return 'all';
-  if (surface === 'form_6m') return 'form_6m';
-  if (surface === 'last5') return 'last5';
-  if (surface === 'last10') return 'last10';
-  if (surface === 'last15') return 'last15';
-  if (surface === 'grandslam') return 'grandslam';
-  if (surface === 'masters') return 'masters';
-  if (surface === 'clay_last10') return 'clay_last10';
-  if (surface === 'hard_last10') return 'hard_last10';
-  if (surface === 'grass_last10') return 'grass_last10';
-  return 'all';
+  const keys = {
+    'clay':'clay','hard':'hard','grass':'grass','all':'all',
+    'form_6m':'form_6m','last5':'last5','last10':'last10','last15':'last15',
+    'grandslam':'grandslam','masters':'masters',
+    'clay_last10':'clay_last10','hard_last10':'hard_last10','grass_last10':'grass_last10'
+  };
+  return keys[surface] || 'all';
 }
 function getEloSurface(surface) {
   if (surface === 'clay' || surface === 'clay_last10') return 'clay';
@@ -214,24 +215,22 @@ function renderTable() {
   const search = document.getElementById('searchBox').value.toLowerCase();
   const sKey = getSurfaceKey(surface);
   const eloSurf = getEloSurface(surface);
-
   const subtitles = {
-    'clay': 'Clay Court Stats | 2022-2026 | Madrid Open Preview',
-    'hard': 'Hard Court Stats | 2022-2026',
-    'grass': 'Grass Court Stats | 2022-2026 | Wimbledon Preview',
-    'all': 'All Surface Stats | 2022-2026',
-    'form_6m': 'Last 6 Months Form | Current 2026',
-    'last5': 'Last 5 Matches Form',
-    'last10': 'Last 10 Matches Form',
-    'last15': 'Last 15 Matches Form',
+    'clay': 'Clay Court Stats | 2022-2026 | Updated """ + generated + """',
+    'hard': 'Hard Court Stats | 2022-2026 | Updated """ + generated + """',
+    'grass': 'Grass Court Stats | 2022-2026 | Updated """ + generated + """',
+    'all': 'All Surface Stats | 2022-2026 | Updated """ + generated + """',
+    'form_6m': 'Last 6 Months Form | Updated """ + generated + """',
+    'last5': 'Last 5 Matches',
+    'last10': 'Last 10 Matches',
+    'last15': 'Last 15 Matches',
+    'clay_last10': 'Clay - Last 10 Matches',
+    'hard_last10': 'Hard - Last 10 Matches',
+    'grass_last10': 'Grass - Last 10 Matches',
     'grandslam': 'Grand Slam Performance | 2022-2026',
-    'masters': 'Masters 1000 Performance | 2022-2026',
-    'clay_last10': 'Clay — Last 10 Matches',
-    'hard_last10': 'Hard — Last 10 Matches',
-    'grass_last10': 'Grass — Last 10 Matches',
+    'masters': 'Masters 1000 Performance | 2022-2026'
   };
   document.getElementById('matrixSubtitle').textContent = subtitles[surface] || '';
-
   let filtered = tennisData.filter(p => {
     const s = p[sKey];
     if (country !== 'all' && p.country !== country) return false;
@@ -240,7 +239,6 @@ function renderTable() {
     if (!s || s.matches < minMatches) return false;
     return true;
   });
-
   filtered.sort((a, b) => {
     const sa = a[sKey]; const sb = b[sKey];
     if (sortBy === 'win_rate') return sb.win_rate - sa.win_rate;
@@ -258,17 +256,15 @@ function renderTable() {
     if (sortBy === 'ace_df') return sb.ace_df_ratio - sa.ace_df_ratio;
     return 0;
   });
-
   document.getElementById('playerCount').textContent = filtered.length + ' players';
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
-
   filtered.forEach(p => {
     const s = p[sKey];
     if (!s || s.matches === 0) return;
     const oddsColor = p.odds === 'N/A' ? '#555' : p.odds.startsWith('+') ? '#4CAF50' : '#4488ff';
     const eloVal = p.elo[eloSurf];
-    const eloTrend = eloSurf === 'overall' ? '—' : p.elo[eloSurf + '_trend'];
+    const eloTrend = eloSurf === 'overall' ? '-' : p.elo[eloSurf + '_trend'];
     const trendClass = getTrendClass(eloTrend);
     const safeName = p.name.replace(/'/g, "\\\\'");
     const row = document.createElement('tr');
@@ -306,7 +302,7 @@ var currentPlayer = '', selectedOpp = '';
 function openH2H(playerName) {
   currentPlayer = playerName;
   selectedOpp = '';
-  document.getElementById('modalTitle').textContent = playerName + ' — H2H';
+  document.getElementById('modalTitle').textContent = playerName + ' - H2H';
   document.getElementById('oppInput').value = '';
   document.getElementById('oppSugg').innerHTML = '';
   document.getElementById('h2hResults').innerHTML = '';
@@ -374,9 +370,11 @@ renderTable();
 
 html_parts = [
     '<!DOCTYPE html><html><head>',
+    '<meta charset="UTF-8">',
     '<title>Layback Analytics - ATP Tennis</title>',
     '<style>', css, '</style>',
     '</head><body>',
+    '<script>if (!sessionStorage.getItem("layback_auth")) { window.location.href = "password.html"; }</script>',
     '<div class="header">',
     '<div class="logo">LAYBACK <span>ANALYTICS</span></div>',
     '<div class="nav-tabs">',
@@ -397,9 +395,9 @@ html_parts = [
     '<option value="last5">Last 5 Matches</option>',
     '<option value="last10">Last 10 Matches</option>',
     '<option value="last15">Last 15 Matches</option>',
-    '<option value="clay_last10">Clay — Last 10</option>',
-    '<option value="hard_last10">Hard — Last 10</option>',
-    '<option value="grass_last10">Grass — Last 10</option>',
+    '<option value="clay_last10">Clay - Last 10</option>',
+    '<option value="hard_last10">Hard - Last 10</option>',
+    '<option value="grass_last10">Grass - Last 10</option>',
     '<option value="grandslam">Grand Slams Only</option>',
     '<option value="masters">Masters Only</option>',
     '</select></div>',
@@ -440,13 +438,13 @@ html_parts = [
     '<div class="legend-item"><div class="legend-box" style="background:#1a7a1a"></div>Elite</div>',
     '<div class="legend-item"><div class="legend-box" style="background:#7a6a00"></div>Good</div>',
     '<div class="legend-item"><div class="legend-box" style="background:#7a1a1a"></div>Weak</div>',
-    '<div class="legend-item"><span class="trend-up2">↑↑</span> Strong rise</div>',
-    '<div class="legend-item"><span class="trend-up1">↑</span> Rising</div>',
-    '<div class="legend-item"><span class="trend-down1">↓</span> Falling</div>',
-    '<div class="legend-item"><span class="trend-down2">↓↓</span> Sharp fall</div>',
+    '<div class="legend-item"><span class="trend-up2">&#8593;&#8593;</span> Strong rise</div>',
+    '<div class="legend-item"><span class="trend-up1">&#8593;</span> Rising</div>',
+    '<div class="legend-item"><span class="trend-down1">&#8595;</span> Falling</div>',
+    '<div class="legend-item"><span class="trend-down2">&#8595;&#8595;</span> Sharp fall</div>',
     '</div>',
     '<table><thead><tr>',
-    '<th class="left">PLAYER</th><th>CTY</th><th>RNK</th><th>AGE</th><th>HT</th><th>HND</th>',
+    '<th class="left">PLAYER</th><th>FLAG</th><th>RNK</th><th>AGE</th><th>HT</th><th>HND</th>',
     '<th>M</th><th>WIN%</th><th>TPW%</th><th>DR</th>',
     '<th>1ST IN%</th><th>1ST WIN%</th><th>2ND WIN%</th>',
     '<th>BP SAV%</th><th>BP CNV%</th>',
@@ -457,7 +455,7 @@ html_parts = [
     '<th>ODDS</th><th>H2H</th>',
     '</tr></thead>',
     '<tbody id="tableBody"></tbody></table>',
-    '<div class="footer">The Gain Line | ATP 200 Players | Sackmann 2022-2024 + TennisMyLife 2025-2026 | Generated: ' + generated + '</div>',
+    '<div class="footer">Layback Analytics | ATP 727 Players | Sackmann 2022-2024 + TennisMyLife 2025-2026 | Generated: ' + generated + '</div>',
     '</div>',
     '<div class="modal-overlay" id="h2hModal">',
     '<div class="modal">',
@@ -480,5 +478,5 @@ filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tennis_matr
 with open(filepath, 'w', encoding='utf-8') as f:
     f.write(html)
 
-print("ATP Tennis Matrix generated! Opening in browser...")
+print("Layback Analytics ATP Tennis Matrix generated!")
 webbrowser.open('file:///' + filepath)
