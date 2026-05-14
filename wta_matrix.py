@@ -39,7 +39,7 @@ th { background: #1a1a1a; padding: 8px 10px; text-align: center; font-size: 10px
 th.left { text-align: left; }
 td { padding: 8px 10px; text-align: center; border-bottom: 1px solid #151515; white-space: nowrap; }
 .player-name { text-align: left; font-weight: bold; font-size: 13px; }
-.country-badge { font-size: 10px; padding: 2px 5px; border-radius: 3px; background: #222; color: #aaa; }
+.country-badge { font-size: 18px; cursor: default; }
 .stat-cell { font-weight: bold; font-size: 13px; border-radius: 3px; padding: 4px 8px; display: inline-block; min-width: 45px; }
 tr:hover { background: #111; }
 .count-badge { background: #333; color: #888; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
@@ -93,6 +93,36 @@ tr:hover { background: #111; }
 """
 
 js_code = """
+function getFlag(ioc) {
+  const map = {
+    'USA':'\uD83C\uDDFA\uD83C\uDDF8','ESP':'\uD83C\uDDEA\uD83C\uDDF8','FRA':'\uD83C\uDDEB\uD83C\uDDF7',
+    'GBR':'\uD83C\uDDEC\uD83C\uDDE7','GER':'\uD83C\uDDE9\uD83C\uDDEA','ITA':'\uD83C\uDDEE\uD83C\uDDF9',
+    'AUS':'\uD83C\uDDE6\uD83C\uDDFA','ARG':'\uD83C\uDDE6\uD83C\uDDF7','RUS':'\uD83C\uDDF7\uD83C\uDDFA',
+    'SRB':'\uD83C\uDDF7\uD83C\uDDF8','CAN':'\uD83C\uDDE8\uD83C\uDDE6','JPN':'\uD83C\uDDEF\uD83C\uDDF5',
+    'CHN':'\uD83C\uDDE8\uD83C\uDDF3','BRA':'\uD83C\uDDE7\uD83C\uDDF7','NOR':'\uD83C\uDDF3\uD83C\uDDF4',
+    'GRE':'\uD83C\uDDEC\uD83C\uDDF7','DEN':'\uD83C\uDDE9\uD83C\uDDF0','POL':'\uD83C\uDDF5\uD83C\uDDF1',
+    'CRO':'\uD83C\uDDED\uD83C\uDDF7','AUT':'\uD83C\uDDE6\uD83C\uDDF9','SUI':'\uD83C\uDDE8\uD83C\uDDED',
+    'BEL':'\uD83C\uDDE7\uD83C\uDDEA','NED':'\uD83C\uDDF3\uD83C\uDDF1','CZE':'\uD83C\uDDE8\uD83C\uDDFF',
+    'SVK':'\uD83C\uDDF8\uD83C\uDDF0','HUN':'\uD83C\uDDED\uD83C\uDDFA','BUL':'\uD83C\uDDE7\uD83C\uDDEC',
+    'ROU':'\uD83C\uDDF7\uD83C\uDDF4','KAZ':'\uD83C\uDDF0\uD83C\uDDFF','UKR':'\uD83C\uDDFA\uD83C\uDDE6',
+    'BLR':'\uD83C\uDDE7\uD83C\uDDFE','KOR':'\uD83C\uDDF0\uD83C\uDDF7','RSA':'\uD83C\uDDFF\uD83C\uDDE6',
+    'CHI':'\uD83C\uDDE8\uD83C\uDDF1','COL':'\uD83C\uDDE8\uD83C\uDDF4','MEX':'\uD83C\uDDF2\uD83C\uDDFD',
+    'POR':'\uD83C\uDDF5\uD83C\uDDF9','SWE':'\uD83C\uDDF8\uD83C\uDDEA','FIN':'\uD83C\uDDEB\uD83C\uDDEE',
+    'NZL':'\uD83C\uDDF3\uD83C\uDDFF','IND':'\uD83C\uDDEE\uD83C\uDDF3','TUN':'\uD83C\uDDF9\uD83C\uDDF3',
+    'MAR':'\uD83C\uDDF2\uD83C\uDDE6','GEO':'\uD83C\uDDEC\uD83C\uDDEA','BIH':'\uD83C\uDDE7\uD83C\uDDE6',
+    'LAT':'\uD83C\uDDF1\uD83C\uDDFB','LTU':'\uD83C\uDDF1\uD83C\uDDF9','EST':'\uD83C\uDDEA\uD83C\uDDEA',
+    'AZE':'\uD83C\uDDE6\uD83C\uDDFF','ARM':'\uD83C\uDDE6\uD83C\uDDF2','UZB':'\uD83C\uDDFA\uD83C\uDDFF',
+    'TPE':'\uD83C\uDDF9\uD83C\uDDFC','MAS':'\uD83C\uDDF2\uD83C\uDDFE','SGP':'\uD83C\uDDF8\uD83C\uDDEC',
+    'HKG':'\uD83C\uDDED\uD83C\uDDF0','DOM':'\uD83C\uDDE9\uD83C\uDDF4','URU':'\uD83C\uDDFA\uD83C\uDDFE',
+    'PAR':'\uD83C\uDDF5\uD83C\uDDFE','PER':'\uD83C\uDDF5\uD83C\uDDEA','ECU':'\uD83C\uDDEA\uD83C\uDDE8',
+    'BOL':'\uD83C\uDDE7\uD83C\uDDF4','BAH':'\uD83C\uDDE7\uD83C\uDDF8','JAM':'\uD83C\uDDEF\uD83C\uDDF2',
+    'IRL':'\uD83C\uDDEE\uD83C\uDDEA','ISR':'\uD83C\uDDEE\uD83C\uDDF1','MDA':'\uD83C\uDDF2\uD83C\uDDE9',
+    'LUX':'\uD83C\uDDF1\uD83C\uDDFA','MON':'\uD83C\uDDF2\uD83C\uDDE8','NGR':'\uD83C\uDDF3\uD83C\uDDEC',
+    'KEN':'\uD83C\uDDF0\uD83C\uDDEA','THA':'\uD83C\uDDF9\uD83C\uDDED','VIE':'\uD83C\uDDFB\uD83C\uDDF3',
+    'PUR':'\uD83C\uDDF5\uD83C\uDDF7','CRC':'\uD83C\uDDE8\uD83C\uDDF7','PAN':'\uD83C\uDDF5\uD83C\uDDE6'
+  };
+  return map[ioc] || ioc;
+}
 function getColor(val, high, mid) {
   if (val >= high) return '#1a7a1a';
   if (val >= mid) return '#7a6a00';
@@ -117,7 +147,7 @@ function populateFilters() {
   const sel = document.getElementById('countryFilter');
   countries.forEach(c => {
     const opt = document.createElement('option');
-    opt.value = c; opt.textContent = c;
+    opt.value = c; opt.textContent = getFlag(c) + ' ' + c;
     sel.appendChild(opt);
   });
 }
@@ -199,7 +229,7 @@ function renderTable() {
     const row = document.createElement('tr');
     row.innerHTML =
       '<td class="player-name">' + p.name + '</td>' +
-      '<td><span class="country-badge">' + p.country + '</span></td>' +
+      '<td><span class="country-badge" title="' + p.country + '">' + getFlag(p.country) + '</span></td>' +
       '<td>#' + p.rank + '</td>' +
       '<td>' + p.age + '</td>' +
       '<td>' + p.height + '</td>' +
@@ -372,7 +402,7 @@ html_parts = [
     '<div class="legend-item"><span class="trend-down2">&#8595;&#8595;</span> Sharp fall</div>',
     '</div>',
     '<table><thead><tr>',
-    '<th class="left">PLAYER</th><th>CTY</th><th>RNK</th><th>AGE</th><th>HT</th><th>HND</th>',
+    '<th class="left">PLAYER</th><th>FLAG</th><th>RNK</th><th>AGE</th><th>HT</th><th>HND</th>',
     '<th>M</th><th>WIN%</th><th>TPW%</th><th>DR</th>',
     '<th>1ST IN%</th><th>1ST WIN%</th><th>2ND WIN%</th>',
     '<th>BP SAV%</th><th>BP CNV%</th>',
@@ -382,7 +412,7 @@ html_parts = [
     '<th>ELO</th><th>TREND</th><th>H2H</th>',
     '</tr></thead>',
     '<tbody id="tableBody"></tbody></table>',
-    '<div class="footer">Layback Analytics | WTA 300 Players | Sackmann 2022-2024 | Generated: ' + generated + '</div>',
+    '<div class="footer">Layback Analytics | WTA 535 Players | Sackmann 2022-2024 | Generated: ' + generated + '</div>',
     '</div>',
     '<div class="modal-overlay" id="h2hModal">',
     '<div class="modal">',

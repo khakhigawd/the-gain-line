@@ -129,7 +129,31 @@ tr:hover { background: #111; }
 .sugg-item { padding: 8px 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #222; }
 .sugg-item:hover { background: #252525; color: #4CAF50; }
 """
-
+js_code = """
+function getFlag(ioc) {
+  const map = {
+    'USA':'🇺🇸','ESP':'🇪🇸','FRA':'🇫🇷','GBR':'🇬🇧','GER':'🇩🇪','ITA':'🇮🇹',
+    'AUS':'🇦🇺','ARG':'🇦🇷','RUS':'🇷🇺','SRB':'🇷🇸','CAN':'🇨🇦','JPN':'🇯🇵',
+    'CHN':'🇨🇳','BRA':'🇧🇷','NOR':'🇳🇴','GRE':'🇬🇷','DEN':'🇩🇰','POL':'🇵🇱',
+    'CRO':'🇭🇷','AUT':'🇦🇹','SUI':'🇨🇭','BEL':'🇧🇪','NED':'🇳🇱','CZE':'🇨🇿',
+    'SVK':'🇸🇰','HUN':'🇭🇺','BUL':'🇧🇬','ROU':'🇷🇴','KAZ':'🇰🇿','UKR':'🇺🇦',
+    'BLR':'🇧🇾','KOR':'🇰🇷','RSA':'🇿🇦','CHI':'🇨🇱','COL':'🇨🇴','MEX':'🇲🇽',
+    'POR':'🇵🇹','SWE':'🇸🇪','FIN':'🇫🇮','NZL':'🇳🇿','IND':'🇮🇳','TUN':'🇹🇳',
+    'MAR':'🇲🇦','EGY':'🇪🇬','TPE':'🇹🇼','THA':'🇹🇭','INA':'🇮🇩','PHI':'🇵🇭',
+    'GEO':'🇬🇪','BIH':'🇧🇦','MDA':'🇲🇩','LUX':'🇱🇺','ISR':'🇮🇱','URU':'🇺🇾',
+    'PAR':'🇵🇾','PER':'🇵🇪','ECU':'🇪🇨','VEN':'🇻🇪','BOL':'🇧🇴','CRC':'🇨🇷',
+    'LAT':'🇱🇻','LTU':'🇱🇹','EST':'🇪🇪','ISL':'🇮🇸','IRL':'🇮🇪','MON':'🇲🇨',
+    'AND':'🇦🇩','MLT':'🇲🇹','CYP':'🇨🇾','ALB':'🇦🇱','MKD':'🇲🇰','MNE':'🇲🇪',
+    'AZE':'🇦🇿','ARM':'🇦🇲','UZB':'🇺🇿','TKM':'🇹🇲','KGZ':'🇰🇬','TJK':'🇹🇯',
+    'PAK':'🇵🇰','BAN':'🇧🇩','SRI':'🇱🇰','NEP':'🇳🇵','MAS':'🇲🇾','SGP':'🇸🇬',
+    'HKG':'🇭🇰','VIE':'🇻🇳','CAM':'🇰🇭','MYA':'🇲🇲','NGR':'🇳🇬','KEN':'🇰🇪',
+    'ETH':'🇪🇹','GHA':'🇬🇭','CMR':'🇨🇲','CIV':'🇨🇮','SEN':'🇸🇳','ZIM':'🇿🇼',
+    'BAH':'🇧🇸','JAM':'🇯🇲','TTO':'🇹🇹','CUB':'🇨🇺','DOM':'🇩🇴','PUR':'🇵🇷',
+    'FIJ':'🇫🇯','SAM':'🇼🇸','TON':'🇹🇴','PNG':'🇵🇬','NCA':'🇳🇮','GUA':'🇬🇹'
+  };
+  return map[ioc] || ioc;
+}
+function getColor(val, high, mid) {
 js_code = """
 function getColor(val, high, mid) {
   if (val >= high) return '#1a7a1a';
@@ -250,7 +274,7 @@ function renderTable() {
     const row = document.createElement('tr');
     row.innerHTML =
       '<td class="player-name">' + p.name + '</td>' +
-      '<td><span class="country-badge">' + p.country + '</span></td>' +
+      '<td><span class="country-badge" title="' + p.country + '">' + getFlag(p.country) + '</span></td>' +
       '<td>#' + p.rank + '</td>' +
       '<td>' + p.age + '</td>' +
       '<td>' + p.height + '</td>' +
