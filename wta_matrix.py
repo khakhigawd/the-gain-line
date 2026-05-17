@@ -49,7 +49,7 @@ for p in players:
     else:
         p['odds'] = 'N/A'
 
-js_data = 'const tennisData = ' + json.dumps(players) + ';\n'
+js_data = 'const tennisData = ' + json.dumps(players, ensure_ascii=False) + ';\n'
 js_data += 'const matchData = ' + json.dumps(matches_list) + ';\n'
 
 css = """
