@@ -118,7 +118,10 @@ tr:hover { background: #111; }
 """
 
 js_code = """
-function getColor(val, high, mid) {
+function getCountryFlag(countryCode) {
+  const flags = {'USA':'🇺🇸','ESP':'🇪🇸','SRB':'🇷🇸','ITA':'🇮🇹','GER':'🇩🇪','FRA':'🇫🇷','AUS':'🇦🇺','CAN':'🇨🇦','GBR':'🇬🇧','AUT':'🇦🇹','SWE':'🇸🇪','NOR':'🇳🇴','DNK':'🇩🇰','RUS':'🇷🇺','UKR':'🇺🇦','POL':'🇵🇱','CZE':'🇨🇿','SVK':'🇸🇰','HUN':'🇭🇺','ROU':'🇷🇴','BUL':'🇧🇬','HRV':'🇭🇷','BIH':'🇧🇦','GRC':'🇬🇷','ALB':'🇦🇱','SVN':'🇸🇮','NLD':'🇳🇱','BEL':'🇧🇪','CHE':'🇨🇭','POR':'🇵🇹','JPN':'🇯🇵','CHN':'🇨🇳','KOR':'🇰🇷','IND':'🇮🇳','PAK':'🇵🇰','BRA':'🇧🇷','ARG':'🇦🇷','MEX':'🇲🇽','CHL':'🇨🇱','COL':'🇨🇴','ECU':'🇪🇨','URY':'🇺🇾','PER':'🇵🇪','VEN':'🇻🇪','THA':'🇹🇭','MYS':'🇲🇾','SGP':'🇸🇬','PHI':'🇵🇭','IDN':'🇮🇩','VNM':'🇻🇳','TWN':'🇹🇼','HKG':'🇭🇰','MUS':'🇲🇺','RSA':'🇿🇦','EGY':'🇪🇬','MAR':'🇲🇦','TUN':'🇹🇳','NGR':'🇳🇬','KEN':'🇰🇪','ISR':'🇮🇱','JOR':'🇯🇴','LBN':'🇱🇧','UZB':'🇺🇿','KAZ':'🇰🇿','TKM':'🇹🇲','TJK':'🇹🇯','KGZ':'🇰🇬','BLR':'🇧🇾','MDA':'🇲🇩','GEO':'🇬🇪','ARM':'🇦🇲','AZE':'🇦🇿','TUR':'🇹🇷','LTU':'🇱🇹','LVA':'🇱🇻','EST':'🇪🇪','FIN':'🇫🇮','ISL':'🇮🇸','IRL':'🇮🇪','MLT':'🇲🇹','CYP':'🇨🇾','NZL':'🇳🇿','FJI':'🇫🇯','PNG':'🇵🇬','TLS':'🇹🇱','KHM':'🇰🇭','LAO':'🇱🇦','MMR':'🇲🇲','BGD':'🇧🇩','SRL':'🇱🇰','AFG':'🇦🇫','IRN':'🇮🇷','IRQ':'🇮🇶','SAU':'🇸🇦','ARE':'🇦🇪','QAT':'🇶🇦','KWT':'🇰🇼','BHR':'🇧🇭','OMN':'🇴🇲','YEM':'🇾🇪','SYR':'🇸🇾','PSE':'🇵🇸','LBY':'🇱🇾','ALG':'🇩🇿'};
+  return flags[countryCode] || countryCode;
+}function getColor(val, high, mid) {
   if (val >= high) return '#1a7a1a';
   if (val >= mid) return '#7a6a00';
   return '#7a1a1a';
@@ -237,7 +240,7 @@ function renderTable() {
     const row = document.createElement('tr');
     row.innerHTML =
       '<td class="player-name">' + p.name + '</td>' +
-      '<td><span class="country-badge">' + p.country + '</span></td>' +
+      '<td><span class="country-badge">' + getCountryFlag(p.country) + '</span></td>' +
       '<td>#' + p.rank + '</td>' +
       '<td>' + p.age + '</td>' +
       '<td>' + p.height + '</td>' +
