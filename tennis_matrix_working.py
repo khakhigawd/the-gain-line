@@ -56,13 +56,17 @@ js_data += 'const matchData = ' + json.dumps(matches_list) + ';\n'
 css = """
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: Arial, sans-serif; background: #0a0a0a; color: #ffffff; overflow-x: auto; }
-.header { background: #111; border-bottom: 2px solid #222; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }.logo { font-size: 22px; font-weight: bold; color: #fff; letter-spacing: 1px; }
+.header { background: #111; border-bottom: 2px solid #222; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+.logo { font-size: 22px; font-weight: bold; color: #fff; letter-spacing: 1px; }
 .logo span { color: #4CAF50; }
 .nav-tabs { display: flex; gap: 5px; }
-.nav-tab { padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 13px; background: #1a1a1a; color: #888; border: 1px solid #333; }.nav-tab.active { background: #4CAF50; color: #fff; border-color: #4CAF50; }
-.controls { display: flex; gap: 10px; padding: 15px 20px; background: #0f0f0f; border-bottom: 1px solid #222; flex-wrap: wrap; align-items: center; }.control-group { display: flex; flex-direction: column; gap: 4px; }
+.nav-tab { padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 13px; background: #1a1a1a; color: #888; border: 1px solid #333; }
+.nav-tab.active { background: #4CAF50; color: #fff; border-color: #4CAF50; }
+.controls { display: flex; gap: 10px; padding: 15px 20px; background: #0f0f0f; border-bottom: 1px solid #222; flex-wrap: wrap; align-items: center; }
+.control-group { display: flex; flex-direction: column; gap: 4px; }
 .control-label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
-select, input { background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 5px; padding: 8px 12px; font-size: 13px; cursor: pointer; }select:focus, input:focus { outline: none; border-color: #4CAF50; }
+select, input { background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 5px; padding: 8px 12px; font-size: 13px; cursor: pointer; }
+select:focus, input:focus { outline: none; border-color: #4CAF50; }
 .search-box { flex: 1; min-width: 200px; }
 .container { padding: 20px; }
 .matrix-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
@@ -73,23 +77,30 @@ th.left { text-align: left; }
 td { padding: 8px 10px; text-align: center; border-bottom: 1px solid #151515; white-space: nowrap; }
 .player-name { text-align: left; font-weight: bold; font-size: 13px; }
 .country-badge { font-size: 10px; padding: 2px 5px; border-radius: 3px; background: #222; color: #aaa; }
-.stat-cell { font-weight: bold; font-size: 13px; border-radius: 3px; padding: 4px 8px; display: inline-block; min-width: 45px; }.odds-cell { font-size: 12px; font-weight: bold; }
+.stat-cell { font-weight: bold; font-size: 13px; border-radius: 3px; padding: 4px 8px; display: inline-block; min-width: 45px; }
+.odds-cell { font-size: 12px; font-weight: bold; }
 tr:hover { background: #111; }
-.count-badge { background: #333; color: #888; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }.footer { text-align: center; color: #333; font-size: 11px; padding: 20px; border-top: 1px solid #111; margin-top: 20px; }.legend { display: flex; gap: 20px; justify-content: center; margin: 15px 0; font-size: 12px; color: #888; flex-wrap: wrap; }.legend-item { display: flex; align-items: center; gap: 6px; }
+.count-badge { background: #333; color: #888; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
+.footer { text-align: center; color: #333; font-size: 11px; padding: 20px; border-top: 1px solid #111; margin-top: 20px; }
+.legend { display: flex; gap: 20px; justify-content: center; margin: 15px 0; font-size: 12px; color: #888; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 6px; }
 .legend-box { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
 .trend-up2 { color: #00dd00; font-weight: bold; }
 .trend-up1 { color: #88cc88; }
 .trend-down2 { color: #ff4444; font-weight: bold; }
 .trend-down1 { color: #cc8888; }
 .trend-flat { color: #555; }
-.h2h-btn { background: #1a3a1a; color: #4CAF50; border: 1px solid #4CAF50; border-radius: 4px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-weight: bold; }.h2h-btn:hover { background: #4CAF50; color: #fff; }
+.h2h-btn { background: #1a3a1a; color: #4CAF50; border: 1px solid #4CAF50; border-radius: 4px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-weight: bold; }
+.h2h-btn:hover { background: #4CAF50; color: #fff; }
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: flex-start; padding-top: 50px; }
 .modal-overlay.active { display: flex; }
-.modal { background: #111; border-radius: 10px; padding: 25px; width: 90%; max-width: 700px; max-height: 80vh; overflow-y: auto; border: 1px solid #333; }.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.modal { background: #111; border-radius: 10px; padding: 25px; width: 90%; max-width: 700px; max-height: 80vh; overflow-y: auto; border: 1px solid #333; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .modal-title { font-size: 16px; font-weight: bold; color: #4CAF50; }
 .modal-close { background: none; border: none; color: #888; font-size: 24px; cursor: pointer; line-height: 1; }
 .modal-close:hover { color: #fff; }
-.h2h-search { width: 100%; background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 5px; padding: 10px; font-size: 14px; margin-bottom: 8px; }.h2h-search:focus { outline: none; border-color: #4CAF50; }
+.h2h-search { width: 100%; background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 5px; padding: 10px; font-size: 14px; margin-bottom: 8px; }
+.h2h-search:focus { outline: none; border-color: #4CAF50; }
 .h2h-lookup-btn { background: #4CAF50; color: #fff; border: none; border-radius: 5px; padding: 10px 20px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 20px; margin-top: 8px; }
 .h2h-lookup-btn:hover { background: #45a045; }
 .h2h-scoreboard { display: flex; justify-content: space-around; align-items: center; background: #1a1a1a; border-radius: 8px; padding: 20px; margin-bottom: 15px; text-align: center; }
@@ -103,7 +114,8 @@ tr:hover { background: #111; }
 .clay-c { color: #cc7700; }
 .hard-c { color: #4488ff; }
 .grass-c { color: #4CAF50; }
-.meetings-hdr { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: bold; }.match-card { background: #0a0a0a; border-radius: 5px; padding: 10px 14px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
+.meetings-hdr { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: bold; }
+.match-card { background: #0a0a0a; border-radius: 5px; padding: 10px 14px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
 .mwinner { font-weight: bold; color: #4CAF50; font-size: 13px; }
 .mscore { color: #aaa; font-size: 12px; }
 .mmeta { display: flex; gap: 6px; align-items: center; font-size: 11px; color: #666; }
@@ -113,7 +125,8 @@ tr:hover { background: #111; }
 .grass-pill { background: #001a00; color: #4CAF50; }
 .gs-pill { background: #2a2000; color: #ccaa00; }
 .m-pill { background: #001a2a; color: #4488ff; }
-.sugg-box { background: #1a1a1a; border: 1px solid #333; border-radius: 5px; max-height: 150px; overflow-y: auto; margin-bottom: 8px; }.sugg-item { padding: 8px 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #222; }
+.sugg-box { background: #1a1a1a; border: 1px solid #333; border-radius: 5px; max-height: 150px; overflow-y: auto; margin-bottom: 8px; }
+.sugg-item { padding: 8px 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #222; }
 .sugg-item:hover { background: #252525; color: #4CAF50; }
 """
 
@@ -189,9 +202,9 @@ function renderTable() {
     'last15': 'Last 15 Matches Form',
     'grandslam': 'Grand Slam Performance | 2022-2026',
     'masters': 'Masters 1000 Performance | 2022-2026',
-    'clay_last10': 'Clay – Last 10 Matches',
-    'hard_last10': 'Hard – Last 10 Matches',
-    'grass_last10': 'Grass – Last 10 Matches',
+    'clay_last10': 'Clay — Last 10 Matches',
+    'hard_last10': 'Hard — Last 10 Matches',
+    'grass_last10': 'Grass — Last 10 Matches',
   };
   document.getElementById('matrixSubtitle').textContent = subtitles[surface] || '';
 
@@ -231,7 +244,7 @@ function renderTable() {
     if (!s || s.matches === 0) return;
     const oddsColor = p.odds === 'N/A' ? '#555' : p.odds.startsWith('+') ? '#4CAF50' : '#4488ff';
     const eloVal = p.elo[eloSurf];
-    const eloTrend = eloSurf === 'overall' ? '–' : p.elo[eloSurf + '_trend'];
+    const eloTrend = eloSurf === 'overall' ? '—' : p.elo[eloSurf + '_trend'];
     const trendClass = getTrendClass(eloTrend);
     const safeName = p.name.replace(/'/g, "\\\\'");
     const row = document.createElement('tr');
@@ -269,7 +282,7 @@ var currentPlayer = '', selectedOpp = '';
 function openH2H(playerName) {
   currentPlayer = playerName;
   selectedOpp = '';
-  document.getElementById('modalTitle').textContent = playerName + ' – H2H';
+  document.getElementById('modalTitle').textContent = playerName + ' — H2H';
   document.getElementById('oppInput').value = '';
   document.getElementById('oppSugg').innerHTML = '';
   document.getElementById('h2hResults').innerHTML = '';
@@ -360,9 +373,9 @@ html_parts = [
     '<option value="last5">Last 5 Matches</option>',
     '<option value="last10">Last 10 Matches</option>',
     '<option value="last15">Last 15 Matches</option>',
-    '<option value="clay_last10">Clay – Last 10</option>',
-    '<option value="hard_last10">Hard – Last 10</option>',
-    '<option value="grass_last10">Grass – Last 10</option>',
+    '<option value="clay_last10">Clay — Last 10</option>',
+    '<option value="hard_last10">Hard — Last 10</option>',
+    '<option value="grass_last10">Grass — Last 10</option>',
     '<option value="grandslam">Grand Slams Only</option>',
     '<option value="masters">Masters Only</option>',
     '</select></div>',
@@ -420,7 +433,7 @@ html_parts = [
     '<th>ODDS</th><th>H2H</th>',
     '</tr></thead>',
     '<tbody id="tableBody"></tbody></table>',
-    '<div class="footer">The Gain Line | ATP ' + str(len(players)) + ' Players | Sackmann 2022-2024 + TennisMyLife 2025-2026 | Generated: ' + generated + '</div>',
+    '<div class="footer">The Gain Line | ATP 200 Players | Sackmann 2022-2024 + TennisMyLife 2025-2026 | Generated: ' + generated + '</div>',
     '</div>',
     '<div class="modal-overlay" id="h2hModal">',
     '<div class="modal">',
