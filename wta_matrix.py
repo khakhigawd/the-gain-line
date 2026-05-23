@@ -3,10 +3,10 @@ import requests
 import webbrowser
 import os
 
-print("Building ATP Tennis Matrix from cached data...")
+print("Building WTA Tennis Matrix from cached data...")
 
 # Load pre-built data
-with open('atp_data.json', 'r', encoding='utf-8') as f:
+with open('wta_data.json', 'r', encoding='utf-8') as f:
     data = json.load(f)
 
 players = data['players']
@@ -18,7 +18,7 @@ print("Data generated: " + generated)
 # Fetch live odds
 def get_tennis_odds():
     try:
-        url = 'https://api.the-odds-api.com/v4/sports/tennis_atp_madrid_open/odds/'
+        url = 'https://api.the-odds-api.com/v4/sports/tennis_wta_madrid_open/odds/'
         params = {'apiKey': 'a3fd838c65e47cfdce22a13933f01a75', 'regions': 'us', 'markets': 'h2h', 'oddsFormat': 'american'}
         r = requests.get(url, params=params)
         data = r.json()
@@ -50,25 +50,25 @@ for p in players:
     else:
         p['odds'] = 'N/A'
 
-js_data = 'const tennisData = ' + json.dumps(players) + ';\n'
-js_data += 'const matchData = ' + json.dumps(matches_list) + ';\n'
+js_data = 'const tennisData = ' + json.dumps(players).replace("'", "\\'") + ';\n'
+js_data += 'const matchData = ' + json.dumps(matches_list).replace("'", "\\'") + ';\n'
 
 css = """
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: Arial, sans-serif; background: #0a0a0a; color: #ffffff; overflow-x: auto; }
 .header { background: #111; border-bottom: 2px solid #222; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }.logo { font-size: 22px; font-weight: bold; color: #fff; letter-spacing: 1px; }
-.logo span { color: #4CAF50; }
+.logo span { color: #FF1493; }
 .nav-tabs { display: flex; gap: 5px; }
-.nav-tab { padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 13px; background: #1a1a1a; color: #888; border: 1px solid #333; }.nav-tab.active { background: #4CAF50; color: #fff; border-color: #4CAF50; }
+.nav-tab { padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 13px; background: #1a1a1a; color: #888; border: 1px solid #333; }.nav-tab.active { background: #FF1493; color: #fff; border-color: #FF1493; }
 .controls { display: flex; gap: 10px; padding: 15px 20px; background: #0f0f0f; border-bottom: 1px solid #222; flex-wrap: wrap; align-items: center; }.control-group { display: flex; flex-direction: column; gap: 4px; }
 .control-label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
-select, input { background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 5px; padding: 8px 12px; font-size: 13px; cursor: pointer; }select:focus, input:focus { outline: none; border-color: #4CAF50; }
+select, input { background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 5px; padding: 8px 12px; font-size: 13px; cursor: pointer; }select:focus, input:focus { outline: none; border-color: #FF1493; }
 .search-box { flex: 1; min-width: 200px; }
 .container { padding: 20px; }
 .matrix-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
 .matrix-subtitle { font-size: 12px; color: #666; margin-bottom: 15px; }
 table { width: 100%; border-collapse: collapse; font-size: 12px; }
-th { background: #1a1a1a; padding: 8px 10px; text-align: center; font-size: 10px; color: #888; letter-spacing: 1px; border-bottom: 2px solid #333; text-transform: uppercase; position: sticky; top: 0; z-index: 10; white-space: nowrap; }
+th { background: #1a1a1a; padding: 8px 10px; text-align: center; font-size: 10px; color: #FF1493; letter-spacing: 1px; border-bottom: 2px solid #FF1493; text-transform: uppercase; position: sticky; top: 0; z-index: 10; white-space: nowrap; }
 th.left { text-align: left; }
 td { padding: 8px 10px; text-align: center; border-bottom: 1px solid #151515; white-space: nowrap; }
 .player-name { text-align: left; font-weight: bold; font-size: 13px; }
@@ -77,23 +77,23 @@ td { padding: 8px 10px; text-align: center; border-bottom: 1px solid #151515; wh
 tr:hover { background: #111; }
 .count-badge { background: #333; color: #888; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }.footer { text-align: center; color: #333; font-size: 11px; padding: 20px; border-top: 1px solid #111; margin-top: 20px; }.legend { display: flex; gap: 20px; justify-content: center; margin: 15px 0; font-size: 12px; color: #888; flex-wrap: wrap; }.legend-item { display: flex; align-items: center; gap: 6px; }
 .legend-box { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
-.trend-up2 { color: #00dd00; font-weight: bold; }
-.trend-up1 { color: #88cc88; }
+.trend-up2 { color: #FF1493; font-weight: bold; }
+.trend-up1 { color: #FF69B4; }
 .trend-down2 { color: #ff4444; font-weight: bold; }
 .trend-down1 { color: #cc8888; }
 .trend-flat { color: #555; }
-.h2h-btn { background: #1a3a1a; color: #4CAF50; border: 1px solid #4CAF50; border-radius: 4px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-weight: bold; }.h2h-btn:hover { background: #4CAF50; color: #fff; }
+.h2h-btn { background: #3a1a2a; color: #FF1493; border: 1px solid #FF1493; border-radius: 4px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-weight: bold; }.h2h-btn:hover { background: #FF1493; color: #fff; }
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: flex-start; padding-top: 50px; }
 .modal-overlay.active { display: flex; }
 .modal { background: #111; border-radius: 10px; padding: 25px; width: 90%; max-width: 700px; max-height: 80vh; overflow-y: auto; border: 1px solid #333; }.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.modal-title { font-size: 16px; font-weight: bold; color: #4CAF50; }
+.modal-title { font-size: 16px; font-weight: bold; color: #FF1493; }
 .modal-close { background: none; border: none; color: #888; font-size: 24px; cursor: pointer; line-height: 1; }
 .modal-close:hover { color: #fff; }
-.h2h-search { width: 100%; background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 5px; padding: 10px; font-size: 14px; margin-bottom: 8px; }.h2h-search:focus { outline: none; border-color: #4CAF50; }
-.h2h-lookup-btn { background: #4CAF50; color: #fff; border: none; border-radius: 5px; padding: 10px 20px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 20px; margin-top: 8px; }
-.h2h-lookup-btn:hover { background: #45a045; }
+.h2h-search { width: 100%; background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 5px; padding: 10px; font-size: 14px; margin-bottom: 8px; }.h2h-search:focus { outline: none; border-color: #FF1493; }
+.h2h-lookup-btn { background: #FF1493; color: #fff; border: none; border-radius: 5px; padding: 10px 20px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 20px; margin-top: 8px; }
+.h2h-lookup-btn:hover { background: #E01E7F; }
 .h2h-scoreboard { display: flex; justify-content: space-around; align-items: center; background: #1a1a1a; border-radius: 8px; padding: 20px; margin-bottom: 15px; text-align: center; }
-.h2h-wins { font-size: 42px; font-weight: bold; color: #4CAF50; }
+.h2h-wins { font-size: 42px; font-weight: bold; color: #FF1493; }
 .h2h-pname { font-size: 14px; font-weight: bold; margin-bottom: 6px; }
 .h2h-vs { font-size: 22px; color: #444; font-weight: bold; }
 .surf-row { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
@@ -102,19 +102,19 @@ tr:hover { background: #111; }
 .surf-rec { font-size: 16px; font-weight: bold; }
 .clay-c { color: #cc7700; }
 .hard-c { color: #4488ff; }
-.grass-c { color: #4CAF50; }
+.grass-c { color: #FF1493; }
 .meetings-hdr { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: bold; }.match-card { background: #0a0a0a; border-radius: 5px; padding: 10px 14px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
-.mwinner { font-weight: bold; color: #4CAF50; font-size: 13px; }
+.mwinner { font-weight: bold; color: #FF1493; font-size: 13px; }
 .mscore { color: #aaa; font-size: 12px; }
 .mmeta { display: flex; gap: 6px; align-items: center; font-size: 11px; color: #666; }
 .pill { padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: bold; }
 .clay-pill { background: #3a1a00; color: #cc7700; }
 .hard-pill { background: #001a3a; color: #4488ff; }
-.grass-pill { background: #001a00; color: #4CAF50; }
+.grass-pill { background: #1a0020; color: #FF1493; }
 .gs-pill { background: #2a2000; color: #ccaa00; }
 .m-pill { background: #001a2a; color: #4488ff; }
 .sugg-box { background: #1a1a1a; border: 1px solid #333; border-radius: 5px; max-height: 150px; overflow-y: auto; margin-bottom: 8px; }.sugg-item { padding: 8px 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #222; }
-.sugg-item:hover { background: #252525; color: #4CAF50; }
+.sugg-item:hover { background: #252525; color: #FF1493; }
 """
 
 js_code = """
@@ -131,10 +131,10 @@ function getTrendClass(trend) {
   return 'trend-flat';
 }
 function getEloColor(elo) {
-  if (elo >= 1900) return '#00dd00';
-  if (elo >= 1750) return '#88cc44';
-  if (elo >= 1650) return '#ccaa00';
-  if (elo >= 1550) return '#cc6600';
+  if (elo >= 1900) return '#FF1493';
+  if (elo >= 1750) return '#FF69B4';
+  if (elo >= 1650) return '#FFB6C1';
+  if (elo >= 1550) return '#FFC0CB';
   return '#888';
 }
 function populateFilters() {
@@ -179,16 +179,16 @@ function renderTable() {
   const eloSurf = getEloSurface(surface);
 
   const subtitles = {
-    'clay': 'Clay Court Stats | 2022-2026 | Madrid Open Preview',
-    'hard': 'Hard Court Stats | 2022-2026',
-    'grass': 'Grass Court Stats | 2022-2026 | Wimbledon Preview',
-    'all': 'All Surface Stats | 2022-2026',
+    'clay': 'Clay Court Stats | 2022-2024 | Madrid Open Preview',
+    'hard': 'Hard Court Stats | 2022-2024',
+    'grass': 'Grass Court Stats | 2022-2024 | Wimbledon Preview',
+    'all': 'All Surface Stats | 2022-2024',
     'form_6m': 'Last 6 Months Form | Current 2026',
     'last5': 'Last 5 Matches Form',
     'last10': 'Last 10 Matches Form',
     'last15': 'Last 15 Matches Form',
-    'grandslam': 'Grand Slam Performance | 2022-2026',
-    'masters': 'Masters 1000 Performance | 2022-2026',
+    'grandslam': 'Grand Slam Performance | 2022-2024',
+    'masters': 'Masters 1000 Performance | 2022-2024',
     'clay_last10': 'Clay – Last 10 Matches',
     'hard_last10': 'Hard – Last 10 Matches',
     'grass_last10': 'Grass – Last 10 Matches',
@@ -229,7 +229,7 @@ function renderTable() {
   filtered.forEach(p => {
     const s = p[sKey];
     if (!s || s.matches === 0) return;
-    const oddsColor = p.odds === 'N/A' ? '#555' : p.odds.startsWith('+') ? '#4CAF50' : '#4488ff';
+    const oddsColor = p.odds === 'N/A' ? '#555' : p.odds.startsWith('+') ? '#FF1493' : '#4488ff';
     const eloVal = p.elo[eloSurf];
     const eloTrend = eloSurf === 'overall' ? '–' : p.elo[eloSurf + '_trend'];
     const trendClass = getTrendClass(eloTrend);
@@ -337,16 +337,17 @@ renderTable();
 
 html_parts = [
     '<!DOCTYPE html><html><head>',
-    '<title>Layback Analytics - ATP Tennis</title>',
+    '<title>Layback Analytics - WTA Tennis</title>',
     '<style>', css, '</style>',
     '</head><body>',
     '<div class="header">',
-    '<div class="logo">LAYBACK <span>ANALYTICS</span></div>',
+    '<div class="logo">THE <span>GAIN</span> LINE</div>',
     '<div class="nav-tabs">',
+    '<div class="nav-tab" onclick="location.href=\'index.html\'">Home</div>',
     '<div class="nav-tab" onclick="location.href=\'prop_matrix.html\'">Super Rugby Pacific</div>',
     '<div class="nav-tab" onclick="location.href=\'epl_matrix.html\'">EPL Soccer</div>',
-    '<div class="nav-tab active">ATP Tennis</div>',
-    '<div class="nav-tab" onclick="location.href=\'wta_matrix.html\'">WTA Tennis</div>',
+    '<div class="nav-tab" onclick="location.href=\'tennis_matrix.html\'">ATP Tennis</div>',
+    '<div class="nav-tab active" onclick="location.href=\'wta_matrix.html\'">WTA Tennis</div>',
     '<div class="nav-tab" onclick="location.href=\'match_simulator.html\'">Simulator</div>',
     '</div></div>',
     '<div class="controls">',
@@ -380,7 +381,7 @@ html_parts = [
     '<div class="control-group"><span class="control-label">Sort By</span>',
     '<select id="sortBy" onchange="renderTable()">',
     '<option value="win_rate">Win Rate</option>',
-    '<option value="rank">ATP Ranking</option>',
+    '<option value="rank">WTA Ranking</option>',
     '<option value="elo">Elo Rating</option>',
     '<option value="tpw">TPW%</option>',
     '<option value="dominance">Dominance Ratio</option>',
@@ -397,8 +398,8 @@ html_parts = [
     '<input type="text" id="searchBox" placeholder="Search player name..." oninput="renderTable()"></div>',
     '</div>',
     '<div class="container">',
-    '<div class="matrix-title">ATP Tennis Matrix <span class="count-badge" id="playerCount"></span></div>',
-    '<div class="matrix-subtitle" id="matrixSubtitle">Clay Court Stats | 2022-2026 | Updated ' + generated + '</div>',
+    '<div class="matrix-title">WTA Tennis Matrix <span class="count-badge" id="playerCount"></span></div>',
+    '<div class="matrix-subtitle" id="matrixSubtitle">Clay Court Stats | 2022-2024 | Updated ' + generated + '</div>',
     '<div class="legend">',
     '<div class="legend-item"><div class="legend-box" style="background:#1a7a1a"></div>Elite</div>',
     '<div class="legend-item"><div class="legend-box" style="background:#7a6a00"></div>Good</div>',
@@ -420,7 +421,7 @@ html_parts = [
     '<th>ODDS</th><th>H2H</th>',
     '</tr></thead>',
     '<tbody id="tableBody"></tbody></table>',
-    '<div class="footer">The Gain Line | ATP ' + str(len(players)) + ' Players | Sackmann 2022-2024 + TennisMyLife 2025-2026 | Generated: ' + generated + '</div>',
+    '<div class="footer">The Gain Line | WTA ' + str(len(players)) + ' Players | Sackmann 2022-2024 + TennisMyLife 2025-2026 | Generated: ' + generated + '</div>',
     '</div>',
     '<div class="modal-overlay" id="h2hModal">',
     '<div class="modal">',
@@ -439,9 +440,8 @@ html_parts = [
 
 html = ''.join(html_parts)
 
-filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tennis_matrix.html')
+filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'wta_matrix.html')
 with open(filepath, 'w', encoding='utf-8') as f:
     f.write(html)
 
-print("ATP Tennis Matrix generated! Opening in browser...")
-webbrowser.open('file:///' + filepath)
+print("WTA Tennis Matrix generated!")
